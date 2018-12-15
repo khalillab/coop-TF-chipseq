@@ -4,8 +4,8 @@ localrules: combine_peaks
 
 rule callpeaks_macs2:
     input:
-        chip_bam = lambda wc: expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=[k for k,v in CHIPS_PASSING.items() if v["group"]==wc.group], factor=FACTOR, species=wc.species),
-        input_bam = lambda wc: expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=[k for k,v in INPUTS_PASSING.items() if v["group"]==wc.group], factor=FACTOR, species=wc.species),
+        chip_bam = lambda wc: expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=[k for k,v in CHIPS_PASSING.items() if v["group"]==wc.group], factor=FACTOR),
+        input_bam = lambda wc: expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=[k for k,v in INPUTS_PASSING.items() if v["group"]==wc.group], factor=FACTOR),
         fasta = os.path.abspath(config["genome"]["fasta"])
     output:
         tsv = "peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.xls",

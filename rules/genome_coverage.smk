@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
-#bam must be sorted by name for bedpe. We don't do this in the bowtie step since samtools indexing required position-sorted bam.
+# bam must be sorted by name for bedpe.
+# Not doing this in the bowtie step is an artifact of samtools indexing required position-sorted bam for splitting species in workflows with spike-ins.
 rule get_fragments:
     input:
         bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
     output:
         f"alignment/fragments/{{sample}}_{FACTOR}-chipseq-fragments.bedpe"
     log:
-        "logs/get_fragments/get_fragments_{sample}-{species}.log"
+        "logs/get_fragments/get_fragments_{sample}.log"
     threads:
         config["threads"]
     shell: """
-        (samtools sort -n -T .{wildcards.sample}_{wildcards.species} -@ {threads} {input.bam} | bedtools bamtobed -bedpe -i stdin > {output}) &> {log}
+        (samtools sort -n -T .{wildcards.sample} -@ {threads} {input.bam} | bedtools bamtobed -bedpe -i stdin > {output}) &> {log}
         """
 
 rule midpoint_coverage:
@@ -19,30 +20,30 @@ rule midpoint_coverage:
         bedpe = f"alignment/fragments/{{sample}}_{FACTOR}-chipseq-fragments.bedpe",
         fasta = os.path.abspath(config["genome"]["fasta"])
     output:
-        f"coverage/counts/{{sample}}_{FACTOR}-chipseq-midpoint-counts.bedgraph"
+        f"coverage/counts/{{sample}}_{FACTOR}-chipseq-counts-midpoints.bedgraph"
     log:
         "logs/midpoint_coverage/midpoint_coverage_{sample}.log"
     shell: """
         (awk 'BEGIN{{FS=OFS="\t"}} {{width=$6-$2}} {{(width % 2 != 0)? (mid=(width+1)/2+$2) : ((rand()<0.5)? (mid=width/2+$2) : (mid=width/2+$2+1))}} {{print $1, mid, mid+1, $7}}' {input.bedpe} | sort -k1,1 -k2,2n | bedtools genomecov -i stdin -g <(faidx {input.fasta} -i chromsizes) -bga | sort -k1,1 -k2,2n > {output}) &> {log}
         """
 
-rule whole_fragment_coverage:
+rule protection_coverage:
     input:
         bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
     output:
-        f"coverage/counts/{{sample}}_{FACTOR}-chipseq-wholefrag-counts.bedgraph"
+        f"coverage/counts/{{sample}}_{FACTOR}-chipseq-counts-protection.bedgraph"
     log:
-        "logs/whole_fragment_coverage/whole_fragment_coverage_{sample}.log"
+        "logs/protection_coverage/protection_coverage_{sample}.log"
     shell: """
         (bedtools genomecov -ibam {input.bam} -bga -pc | sort -k1,1 -k2,2n > {output}) &> {log}
         """
 
 rule normalize_genome_coverage:
     input:
-        counts = f"coverage/counts/{{sample}}_{FACTOR}-chipseq-{readtype}-counts.bedgraph",
+        counts = f"coverage/counts/{{sample}}_{FACTOR}-chipseq-counts-{{readtype}}.bedgraph",
         bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
     output:
-        normalized = f"coverage/libsizenorm/{{sample}}_{FACTOR}-{{readtype}}-libsizenorm.bedgraph"
+        normalized = f"coverage/libsizenorm/{{sample}}_{FACTOR}-chipseq-libsizenorm-{{readtype}}.bedgraph"
     log:
         "logs/normalize_genome_coverage/normalize_genome_coverage_{sample}-{readtype}.log"
     shell: """
@@ -51,10 +52,10 @@ rule normalize_genome_coverage:
 
 rule bedgraph_to_bigwig:
     input:
-        bedgraph = f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{readtype}}-{{norm}}.bedgraph",
+        bedgraph = f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bedgraph",
         fasta = os.path.abspath(config["genome"]["fasta"])
     output:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{readtype}}-{{norm}}.bw"
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{norm}}-{{readtype}}.bw"
     log:
         "logs/bedgraph_to_bigwig/bedgraph_to_bigwig_{sample}-{readtype}-{norm}.log"
     shell: """
@@ -63,9 +64,9 @@ rule bedgraph_to_bigwig:
 
 rule smoothed_midpoint_coverage:
     input:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-midpoint-{{norm}}.bw"
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{norm}}-midpoints.bw"
     output:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-midpoint_smoothed-{{norm}}.bw"
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{norm}}-midpoints_smoothed.bw"
     params:
         bandwidth = config["smooth_bandwidth"]
     conda:

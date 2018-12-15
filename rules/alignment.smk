@@ -31,10 +31,10 @@ rule align:
         r2 = f"fastq/cleaned/{{sample}}_{FACTOR}-chipseq-cleaned.r2.fastq.gz",
     output:
         bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
-        unaligned_r1 = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.fastq.1.gz",
-        unaligned_r2 = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.fastq.2.gz",
-        aligned_r1 = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.fastq.1.gz",
-        aligned_r2 = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.fastq.2.gz",
+        unaligned_r1 = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.r1.fastq.gz",
+        unaligned_r2 = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.r2.fastq.gz",
+        aligned_r1 = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.r1.fastq.gz",
+        aligned_r2 = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.r2.fastq.gz",
         log = "logs/align/align_{sample}.log"
     params:
         idx_path = config["bowtie2"]["index-path"],

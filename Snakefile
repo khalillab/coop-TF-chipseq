@@ -35,9 +35,8 @@ wildcard_constraints:
     figure = "|".join(re.escape(x) for x in FIGURES.keys()),
     annotation = "|".join(re.escape(x) for x in set(itertools.chain(*[FIGURES[figure]["annotations"].keys() for figure in FIGURES]))),
     status = "all|passing",
-    counttype= "counts|sicounts",
     norm = "counts|libsizenorm",
-    strand = "SENSE|ANTISENSE|plus|minus|midpoints|protection",
+    strand = "midpoints|protection",
     windowsize = "\d+",
     direction = "all|up|unchanged|down",
     factor=FACTOR
@@ -61,10 +60,10 @@ wildcard_constraints:
 
 include: "rules/clean_reads.smk"
 include: "rules/alignment.smk"
-# include: "rules/chip-seq_fastqc.smk"
+include: "rules/fastqc.smk"
 # include: "rules/chip-seq_library_processing_summary.smk"
-# include: "rules/chip-seq_peakcalling.smk"
-# include: "rules/chip-seq_genome_coverage.smk"
+include: "rules/peakcalling.smk"
+include: "rules/genome_coverage.smk"
 # include: "rules/chip-seq_sample_similarity.smk"
 # include: "rules/chip-seq_datavis.smk"
 # include: "rules/mnase-seq_differential_occupancy.smk"
@@ -85,8 +84,13 @@ rule all:
         #require config file so that it gets archived
         "config.yaml",
         #fastqc
-        # expand("fastq/cleaned/{sample}_{factor}-chipseq-cleaned.{read}.fastq.gz", sample=SAMPLES, factor=FACTOR, read=["r1", "r2"]),
-        expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR)
+        f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_base_quality.svg',
+        #alignment
+        expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR),
+        #peakcalling
+        expand("peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.narrowPeak", group=GROUPS, factor=FACTOR),
+        #genome coverage
+        expand("coverage/{norm}/{sample}_{factor}-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR)
 
 
 

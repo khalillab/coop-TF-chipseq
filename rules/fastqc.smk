@@ -7,7 +7,6 @@ localrules:
 rule fastqc_raw:
     input:
         fastq = lambda wc: config["unmatched"][wc.readnumber] if wc.sample=="unmatched" else SAMPLES[wc.sample][wc.readnumber],
-        adapters = "fastq/adapters.tsv"
     output:
         "qual_ctrl/fastqc/raw/{sample}_{readnumber}_fastqc-data-raw.txt",
     params:

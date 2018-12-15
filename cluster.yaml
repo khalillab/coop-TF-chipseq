@@ -7,20 +7,20 @@ __default__ :
     log : "logs/cluster/{rule}.{wildcards}.log"
     err : "logs/cluster/{rule}.{wildcards}.err"
 
-# fastqc_raw:
-#     time : 10
-#     n : 2
-#     mem : 200
+fastqc_raw:
+    time : 10
+    n : 2
+    mem : 200
 
-# fastqc_processed:
-#     time : 4
-#     n : 2
-#     mem : 200
+fastqc_processed:
+    time : 4
+    n : 2
+    mem : 200
 
-# plot_fastqc_summary:
-#     time: 4
-#     n: 1
-#     mem: 400
+plot_fastqc_summary:
+    time: 4
+    n: 1
+    mem: 400
 
 clean_reads:
     time : 15
@@ -41,30 +41,34 @@ align:
 #     n: 4
 #     mem: 4000
 
-# get_fragments:
-#     time : 20
-#     n : 2
-#     mem : 4000
+get_fragments:
+    time : 20
+    n : 2
+    mem : 4000
 
-# midpoint_coverage:
-#     time : 3
-#     mem : 75
+midpoint_coverage:
+    time : 3
+    mem : 75
 
-# whole_fragment_coverage:
-#     time : 3
-#     mem : 75
+protection_coverage:
+    time : 3
+    mem : 75
 
-# smoothed_midpoint_coverage:
-#     time : 3
-#     mem : 75
+smoothed_midpoint_coverage:
+    time : 3
+    mem : 75
 
-# normalize_genome_coverage:
-#     time: 4
-#     mem: 50
+normalize_genome_coverage:
+    time: 4
+    mem: 50
 
-# bedgraph_to_bigwig:
-#     time: 2
-#     mem: 2
+bedgraph_to_bigwig:
+    time: 2
+    mem: 2
+
+callpeaks_macs2:
+    time : 15
+    mem : 1000
 
 # map_to_windows:
 #     time: 7
