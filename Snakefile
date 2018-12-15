@@ -85,4 +85,9 @@ rule all:
         #require config file so that it gets archived
         "config.yaml",
         #fastqc
-        expand("fastq/cleaned/{sample}_{factor}-chipseq-cleaned.{read}.fastq.gz", sample=SAMPLES, factor=FACTOR, read=["r1", "r2"])
+        # expand("fastq/cleaned/{sample}_{factor}-chipseq-cleaned.{read}.fastq.gz", sample=SAMPLES, factor=FACTOR, read=["r1", "r2"]),
+        expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR)
+
+
+
+

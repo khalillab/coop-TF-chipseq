@@ -31,8 +31,10 @@ rule align:
         r2 = f"fastq/cleaned/{{sample}}_{FACTOR}-chipseq-cleaned.r2.fastq.gz",
     output:
         bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
-        unaligned_fastq = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.fastq.gz",
-        aligned_fastq = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.fastq.gz",
+        unaligned_r1 = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.fastq.1.gz",
+        unaligned_r2 = f"fastq/unaligned/{{sample}}_{FACTOR}-chipseq-unaligned.fastq.2.gz",
+        aligned_r1 = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.fastq.1.gz",
+        aligned_r2 = f"fastq/aligned/{{sample}}_{FACTOR}-chipseq-aligned.fastq.2.gz",
         log = "logs/align/align_{sample}.log"
     params:
         idx_path = config["bowtie2"]["index-path"],
@@ -44,7 +46,7 @@ rule align:
     threads:
         config["threads"]
     shell: """
-        (bowtie2 --minins {params.min_fraglength} --maxins {params.max_fraglength} --fr --no-mixed --no-discordant --al-conc-gz {output.aligned_fastq} --un-conc-gz {output.unaligned_fastq} -p {threads} -x {params.idx_path}/{basename} -1 {input.r1} -2 {input.r2}  | samtools view -buh -q {params.minmapq} - | samtools sort -T .{wildcards.sample} -@ {threads} -o {output.bam} -) &> {output.log}
+        (bowtie2 --minins {params.min_fraglength} --maxins {params.max_fraglength} --fr --no-mixed --no-discordant --al-conc-gz fastq/aligned/{wildcards.sample}_{FACTOR}-chipseq-aligned.fastq.gz --un-conc-gz fastq/unaligned/{wildcards.sample}_{FACTOR}-chipseq-unaligned.fastq.gz -p {threads} -x {params.idx_path}/{basename} -1 {input.r1} -2 {input.r2}  | samtools view -buh -q {params.minmapq} - | samtools sort -T .{wildcards.sample} -@ {threads} -o {output.bam} -) &> {output.log}
         """
 
 ##indexing is required for separating species by samtools view
