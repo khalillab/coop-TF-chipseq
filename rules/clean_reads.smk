@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+#   0) cut off the 5'-most base (left from A-tailing)
 #   1) search for and remove the constant region of the TruSeq adapter in both reads
 #   2) do quality trimming for both reads with --nextseq-trim 2-color quality trimming
 rule clean_reads:
@@ -17,6 +18,6 @@ rule clean_reads:
     threads:
         config["threads"]
     shell: """
-        (cutadapt --adapter=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --trim-n --cores={threads} --nextseq-trim={params.qual_cutoff} --output={output.r1} --paired-output={output.r2} {input.r1} {input.r2}) &> {output.log}
+        (cutadapt --cut=1 --adapter=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --trim-n --cores={threads} --nextseq-trim={params.qual_cutoff} --minimum-length=6 --output={output.r1} --paired-output={output.r2} {input.r1} {input.r2}) &> {output.log}
         """
 

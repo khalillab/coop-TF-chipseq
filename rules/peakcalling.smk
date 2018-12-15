@@ -11,8 +11,6 @@ rule callpeaks_macs2:
         tsv = "peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.xls",
         peaks = "peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.narrowPeak",
         summits = "peakcalling/macs/{group}/{group}_{factor}-chipseq_summits.bed",
-        script = "peakcalling/macs/{group}/{group}_{factor}-chipseq_model.r",
-        pdf = "peakcalling/macs/{group}/{group}_{factor}-chipseq_model.pdf",
         treat_bg = "peakcalling/macs/{group}/{group}_{factor}-chipseq_treat_pileup.bdg",
         cntrl_bg = "peakcalling/macs/{group}/{group}_{factor}-chipseq_control_lambda.bdg"
     params:
@@ -28,7 +26,6 @@ rule callpeaks_macs2:
         "logs/macs2/macs2_{group}-{factor}.log"
     shell: """
         (macs2 callpeak --treatment {input.chip_bam} --control {input.input_bam} --format BAMPE --name peakcalling/macs/{wildcards.group}/{wildcards.group}_{wildcards.factor}-chipseq --SPMR --bw {params.bw} --mfold {params.mfold_low} {params.mfold_high} --gsize $(faidx {input.fasta} -i chromsizes | awk '{{sum += $2}} END {{print sum}}') --qvalue {params.qscore} --slocal {params.slocal} --llocal {params.llocal} --keep-dup auto --bdg --call-summits) &> {log}
-        (Rscript {output.script}) &>> {log}
         (sed -i -e 's/peakcalling\/macs\/{wildcards.group}\///g' {output.peaks}) &>> {log}
         (sed -i -e 's/peakcalling\/macs\/{wildcards.group}\///g' {output.summits}) &>> {log}
         """

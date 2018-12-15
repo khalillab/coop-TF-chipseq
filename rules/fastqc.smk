@@ -109,7 +109,6 @@ rule plot_fastqc_summary:
         per_seq_qual =  f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_sequence_quality.svg',
         per_base_seq_content = f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_base_sequence_content.svg',
         per_seq_gc = f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_sequence_gc.svg',
-        per_base_n = f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_base_n.svg',
         seq_length_dist = f'qual_ctrl/fastqc/{FACTOR}_chipseq-sequence_length_distribution.svg',
         seq_duplication = f'qual_ctrl/fastqc/{FACTOR}_chipseq-sequence_duplication_levels.svg',
         adapter_content = f'qual_ctrl/fastqc/{FACTOR}_chipseq-adapter_content.svg',

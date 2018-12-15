@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 localrules:
-    build_read_processing_table,
+    aggregate_read_numbers,
     plot_read_processing,
     plot_fragment_lengths
 
@@ -28,9 +28,9 @@ rule plot_fragment_lengths:
     conda:
         "../envs/tidyverse.yaml"
     script:
-        "scripts/paired_end_fragment_length.R"
+        "../scripts/paired_end_fragment_length.R"
 
-rule build_read_processing_table:
+rule aggregate_read_numbers:
     input:
         adapter = expand("logs/clean_reads/clean_reads-{sample}.log", sample=SAMPLES),
         align = expand("logs/align/align_{sample}.log", sample=SAMPLES),
@@ -39,10 +39,14 @@ rule build_read_processing_table:
     log:
         "logs/read_processing_summary.log"
     run:
-        shell("""(echo -e "sample\traw\tcleaned\tmapped" > {output}) &> {log}""")
+        shell("""(echo -e "sample\traw\tcleaned\tmapped\tunique_map\tpaired" > {output}) &> {log}""")
         for sample, adapter, align in zip(SAMPLES.keys(), input.adapter, input.align):
-            shell("""(grep -e "Total read pairs processed:" -e "Pairs written" {adapter} | cut -d: -f2 | sed 's/,//g' | awk 'BEGIN{{ORS="\t"; print "{sample}"}}{{print $1}}' >> {output}) &> {log}""")
-            shell("""(grep -e "^Reported" {align} | awk '{{print $2}}' >> {output}) &> {log}""")
+            shell("""
+                  (grep -e "Total read pairs processed:" -e "Pairs written" {adapter} | cut -d: -f2 | sed 's/,//g' | awk 'BEGIN{{ORS="\t"; print "{sample}"}}{{print $1}}' >> {output}
+                   grep -e "1 time" {align} | awk 'BEGIN{{sum=0; ORS="\t"}} {{sum+=$1}} END{{print sum}}' >> {output}
+                   grep -e "exactly 1 time" {align} | awk 'BEGIN{{sum=0; ORS="\t"}} {{sum+=$1}} END{{print sum}}' >> {output}
+                   grep -e "concordantly exactly 1 time" {align} | awk '{{print $1}}' >> {output}) &> {log}
+                   """)
 
 rule plot_read_processing:
     input:
