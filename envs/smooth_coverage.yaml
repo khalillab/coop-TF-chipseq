@@ -1,0 +1,8 @@
+name: smooth_coverage
+channels:
+    - conda-forge
+    - bioconda
+dependencies:
+    - numpy=1.15.4
+    - scipy=1.1.0
+    - pybigwig=0.3.12
