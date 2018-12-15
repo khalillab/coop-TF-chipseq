@@ -20,6 +20,7 @@ README.html
 
 config.yaml
 *.*.swp
+.*.bam
 
 !fastq/.gitkeep
 !logs/.gitkeep

@@ -47,10 +47,10 @@ rule align:
         config["threads"]
     shell: """
         (bowtie2 --minins {params.min_fraglength} --maxins {params.max_fraglength} --fr --no-mixed --no-discordant --al-conc-gz fastq/aligned/{wildcards.sample}_{FACTOR}-chipseq-aligned.fastq.gz --un-conc-gz fastq/unaligned/{wildcards.sample}_{FACTOR}-chipseq-unaligned.fastq.gz -p {threads} -x {params.idx_path}/{basename} -1 {input.r1} -2 {input.r2}  | samtools view -buh -q {params.minmapq} - | samtools sort -T .{wildcards.sample} -@ {threads} -o {output.bam} -) &> {output.log}
-        (mv fastq/aligned/{wildcards.sample}_{FACTOR}-chipseq-aligned.fastq.1.gz {output.aligned_r1}
+        mv fastq/aligned/{wildcards.sample}_{FACTOR}-chipseq-aligned.fastq.1.gz {output.aligned_r1}
         mv fastq/aligned/{wildcards.sample}_{FACTOR}-chipseq-aligned.fastq.2.gz {output.aligned_r2}
         mv fastq/unaligned/{wildcards.sample}_{FACTOR}-chipseq-unaligned.fastq.1.gz {output.unaligned_r1}
-        mv fastq/unaligned/{wildcards.sample}_{FACTOR}-chipseq-unaligned.fastq.2.gz {output.unaligned_r2}) &>> {log}
+        mv fastq/unaligned/{wildcards.sample}_{FACTOR}-chipseq-unaligned.fastq.2.gz {output.unaligned_r2}
         """
 
 ##indexing is required for separating species by samtools view

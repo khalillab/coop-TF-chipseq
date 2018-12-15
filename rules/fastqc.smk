@@ -4,41 +4,19 @@ localrules:
     fastqc_aggregate
 
 #fastQC on raw (demultiplexed) data
-rule fastqc_raw:
+rule fastqc:
     input:
-        fastq = lambda wc: config["unmatched"][wc.readnumber] if wc.sample=="unmatched" else SAMPLES[wc.sample][wc.readnumber],
-    output:
-        "qual_ctrl/fastqc/raw/{sample}_{readnumber}_fastqc-data-raw.txt",
-    params:
-        fname = lambda wc: re.split('.fq|.fastq', os.path.split(config["unmatched"][wc.readnumber])[1])[0] if wc.sample=="unmatched" else re.split('.fq|.fastq', os.path.split(SAMPLES[wc.sample][wc.readnumber])[1])[0],
-        adapter = lambda wc: {"r1": "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
-                              "r2": "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"}.get(wc.readnumber)
-    threads:
-        config["threads"]
-    log:
-        "logs/fastqc_raw/fastqc_raw-{sample}-{readnumber}.log"
-    shell: """
-        (mkdir -p qual_ctrl/fastqc/raw
-        fastqc --adapters <(echo -e "adapter\t{params.adapter}") --nogroup --noextract -t {threads} -o qual_ctrl/fastqc/raw {input.fastq}
-        unzip -p qual_ctrl/fastqc/raw/{params.fname}_fastqc.zip {params.fname}_fastqc/fastqc_data.txt > {output}) &> {log}
-        """
-
-#fastqc for cleaned, aligned, and unaligned reads
-rule fastqc_processed:
-    input:
-        fastq = f"fastq/{{fqtype}}/{{sample}}_{FACTOR}-chipseq-{{fqtype}}.{{readnumber}}.fastq.gz",
+        fastq = lambda wc: (config["unmatched"][wc.readnumber] if wc.sample=="unmatched" else SAMPLES[wc.sample][wc.readnumber]) if wc.fqtype=="raw" else f"fastq/{wc.fqtype}/{wc.sample}_{FACTOR}-chipseq-{wc.fqtype}.{wc.readnumber}.fastq.gz"
     output:
         "qual_ctrl/fastqc/{fqtype}/{sample}_{readnumber}_fastqc-data-{fqtype}.txt",
     params:
-        fname = lambda wc: "{sample}-{fqtype}.{readnumber}".format(**wc),
+        fname = lambda wc: (re.split('.fq|.fastq', os.path.split(config["unmatched"][wc.readnumber])[1])[0] if wc.sample=="unmatched" else re.split('.fq|.fastq', os.path.split(SAMPLES[wc.sample][wc.readnumber])[1])[0]) if wc.fqtype=="raw" else f"{wc.sample}_{FACTOR}-chipseq-{wc.fqtype}.{wc.readnumber}",
         adapter = lambda wc: {"r1": "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
                               "r2": "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"}.get(wc.readnumber)
-    wildcard_constraints:
-        fqtype="cleaned|aligned|unaligned"
     threads:
         config["threads"]
     log:
-        "logs/fastqc_processed/fastqc_processed-{sample}-{fqtype}-{readnumber}.log"
+        "logs/fastqc/fastqc_{fqtype}-{sample}-{readnumber}.log"
     shell: """
         (mkdir -p qual_ctrl/fastqc/{wildcards.fqtype}
         fastqc --adapters <(echo -e "adapter\t{params.adapter}") --nogroup --noextract -t {threads} -o qual_ctrl/fastqc/{wildcards.fqtype} {input.fastq}

@@ -10,12 +10,7 @@ __default__ :
 fastqc_raw:
     time : 10
     n : 2
-    mem : 200
-
-fastqc_processed:
-    time : 4
-    n : 2
-    mem : 200
+    mem : 250
 
 plot_fastqc_summary:
     time: 4
