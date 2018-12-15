@@ -7,9 +7,9 @@ __default__ :
     log : "logs/cluster/{rule}.{wildcards}.log"
     err : "logs/cluster/{rule}.{wildcards}.err"
 
-fastqc_raw:
-    time : 10
-    n : 2
+fastqc:
+    time : 4
+    n : 1
     mem : 250
 
 plot_fastqc_summary:
@@ -20,25 +20,25 @@ plot_fastqc_summary:
 clean_reads:
     time : 15
     n : 4
-    mem : 150
+    mem : 100
 
 align:
-    time : 60
+    time : 25
     n : 4
     mem : 1000
 
 get_fragment_lengths:
-    time: 60
+    time: 10
     n: 4
-    mem: 4000
+    mem: 100
 
 get_fragments:
-    time : 20
+    time : 5
     n : 2
-    mem : 4000
+    mem : 1000
 
 midpoint_coverage:
-    time : 3
+    time : 4
     mem : 75
 
 protection_coverage:
@@ -58,8 +58,8 @@ bedgraph_to_bigwig:
     mem: 2
 
 callpeaks_macs2:
-    time : 15
-    mem : 1000
+    time : 6
+    mem : 400
 
 map_to_windows:
     time: 7
@@ -84,20 +84,4 @@ plot_scatter_plots:
 # plot_figures:
 #     time : 40
 #     mem : 10000
-
-# danpos_quantification:
-#     time: 60
-#     mem: 4000
-
-# plot_danpos_results:
-#     time: 10
-#     mem: 10000
-
-# danpos_vis_over_annotations:
-#     time: 10
-#     mem: 10000
-
-# call_nuclevel_changes:
-#     time: 10
-#     mem: 10000
 

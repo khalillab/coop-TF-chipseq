@@ -18,6 +18,6 @@ rule clean_reads:
     threads:
         config["threads"]
     shell: """
-        (cutadapt --cut=1 --adapter=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --trim-n --cores={threads} --nextseq-trim={params.qual_cutoff} --minimum-length=6 --output={output.r1} --paired-output={output.r2} {input.r1} {input.r2}) &> {output.log}
+        (cutadapt --cut=5 --adapter=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --trim-n --cores={threads} --nextseq-trim={params.qual_cutoff} --minimum-length=6 --output={output.r1} --paired-output={output.r2} {input.r1} {input.r2}) &> {output.log}
         """
 
