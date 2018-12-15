@@ -1,0 +1,27 @@
+.snakemake/
+logs/*
+logs/cluster/*
+scripts/.snakemake*
+fastq/*
+alignment/
+qual_ctrl/
+coverage/
+datavis/
+peakcalling/
+/* diff_exp/ */
+
+snakemake.err
+snakemake.log
+rulegraph.svg
+dag.svg
+Rplots.pdf
+mogrify.log
+README.html
+
+config.yaml
+*.*.swp
+
+!fastq/.gitkeep
+!logs/.gitkeep
+!logs/cluster/
+!logs/cluster/.gitkeep
