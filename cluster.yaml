@@ -32,14 +32,10 @@ align:
     n : 4
     mem : 1000
 
-# bam_separate_species:
-#     time: 2
-#     mem: 1
-
-# get_fragment_lengths:
-#     time: 60
-#     n: 4
-#     mem: 4000
+get_fragment_lengths:
+    time: 60
+    n: 4
+    mem: 4000
 
 get_fragments:
     time : 20
@@ -70,17 +66,17 @@ callpeaks_macs2:
     time : 15
     mem : 1000
 
-# map_to_windows:
-#     time: 7
-#     mem: 100
+map_to_windows:
+    time: 7
+    mem: 100
 
-# join_window_counts:
-#     time: 5
-#     mem: 100
+join_window_counts:
+    time: 5
+    mem: 100
 
-# plot_scatter_plots:
-#     time : 20
-#     mem : 10000
+plot_scatter_plots:
+    time : 20
+    mem : 10000
 
 # # plot_fragsizes:
 # #     time : 60

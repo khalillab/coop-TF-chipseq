@@ -41,30 +41,21 @@ wildcard_constraints:
     direction = "all|up|unchanged|down",
     factor=FACTOR
 
-# status_norm_sample_dict = {
-#     "all":
-#         {   "libsizenorm" : SAMPLES,
-#             "spikenorm" : SISAMPLES
-#         },
-#     "passing":
-#         {   "libsizenorm" : PASSING,
-#             "spikenorm" : SIPASSING
-#         }
-#     }
-
-# def get_samples(status, norm, groups):
-#     if "all" in groups:
-#         return(list(status_norm_sample_dict[status][norm].keys()))
-#     else:
-#         return([k for k,v in status_norm_sample_dict[status][norm].items() if v["group"] in groups])
+def get_samples(status, groups):
+    sampledict = {"all": SAMPLES,
+                  "passing": PASSING}.get(status)
+    if "all" in groups:
+        return(list(sampledict.keys()))
+    else:
+        return([k for k,v in sampledict.items() if v["group"] in groups])
 
 include: "rules/clean_reads.smk"
 include: "rules/alignment.smk"
 include: "rules/fastqc.smk"
-# include: "rules/chip-seq_library_processing_summary.smk"
+include: "rules/library_processing_summary.smk"
 include: "rules/peakcalling.smk"
 include: "rules/genome_coverage.smk"
-# include: "rules/chip-seq_sample_similarity.smk"
+include: "rules/sample_similarity.smk"
 # include: "rules/chip-seq_datavis.smk"
 # include: "rules/mnase-seq_differential_occupancy.smk"
 
@@ -85,12 +76,17 @@ rule all:
         "config.yaml",
         #fastqc
         f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_base_quality.svg',
+        #library processing summaries
+        f"qual_ctrl/fragment_length_distributions/{FACTOR}_chipseq_fragment_length_distributions.svg",
+        f"qual_ctrl/read_processing/{FACTOR}_chipseq_read_processing-loss.svg",
         #alignment
         expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR),
         #peakcalling
         expand("peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.narrowPeak", group=GROUPS, factor=FACTOR),
         #genome coverage
-        expand("coverage/{norm}/{sample}_{factor}-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR)
+        expand("coverage/{norm}/{sample}_{factor}-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
+        #scatterplots
+        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"])
 
 
 
