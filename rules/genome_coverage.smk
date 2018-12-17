@@ -47,7 +47,7 @@ rule normalize_genome_coverage:
     log:
         "logs/normalize_genome_coverage/normalize_genome_coverage_{sample}-{readtype}.log"
     shell: """
-        (awk -v norm_factor=$(samtools view -c {input.bam}) 'BEGIN{{FS=OFS="\t"}}{{$4=$4/norm_factor; print $0}}' {input.counts} > {output.normalized}) &> {log}
+        (awk -v norm_factor=$(samtools view -c {input.bam}) 'BEGIN{{FS=OFS="\t"}}{{$4=$4/norm_factor*1e6; print $0}}' {input.counts} > {output.normalized}) &> {log}
         """
 
 rule bedgraph_to_bigwig:
@@ -55,7 +55,7 @@ rule bedgraph_to_bigwig:
         bedgraph = f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bedgraph",
         fasta = os.path.abspath(config["genome"]["fasta"])
     output:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{norm}}-{{readtype}}.bw"
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw"
     log:
         "logs/bedgraph_to_bigwig/bedgraph_to_bigwig_{sample}-{readtype}-{norm}.log"
     shell: """
@@ -64,9 +64,9 @@ rule bedgraph_to_bigwig:
 
 rule smoothed_midpoint_coverage:
     input:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{norm}}-midpoints.bw"
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-midpoints.bw"
     output:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-{{norm}}-midpoints_smoothed.bw"
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-midpoints_smoothed.bw"
     params:
         bandwidth = config["smooth_bandwidth"]
     conda:

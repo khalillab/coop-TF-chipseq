@@ -30,7 +30,6 @@ wildcard_constraints:
     group = "|".join(set(re.escape(v["group"]) for k,v in CHIPS.items())),
     control = "|".join(set(re.escape(x) for x in controlgroups + ["all"])),
     condition = "|".join(set(re.escape(x) for x in conditiongroups + ["all"])),
-    # species = "experimental|spikein",
     read_status = "raw|cleaned|aligned|unaligned",
     figure = "|".join(re.escape(x) for x in FIGURES.keys()),
     annotation = "|".join(re.escape(x) for x in set(itertools.chain(*[FIGURES[figure]["annotations"].keys() for figure in FIGURES]))),
@@ -56,7 +55,7 @@ include: "rules/library_processing_summary.smk"
 include: "rules/peakcalling.smk"
 include: "rules/genome_coverage.smk"
 include: "rules/sample_similarity.smk"
-# include: "rules/chip-seq_datavis.smk"
+include: "rules/datavis.smk"
 # include: "rules/mnase-seq_differential_occupancy.smk"
 
 onsuccess:
@@ -84,7 +83,9 @@ rule all:
         #peakcalling
         expand("peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.narrowPeak", group=GROUPS, factor=FACTOR),
         #genome coverage
-        expand("coverage/{norm}/{sample}_{factor}-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
         #scatterplots
-        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"])
+        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"]),
+        #datavis
+        expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bygroup.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), figure=FIGURES, status=statuscheck(SAMPLES, PASSING), readtype=["protection", "midpoints"], factor=FACTOR) if config["plot_figures"] else []
 
