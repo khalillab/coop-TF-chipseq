@@ -13,11 +13,12 @@ rule clean_reads:
         log = "logs/clean_reads/clean_reads-{sample}.log"
     params:
         qual_cutoff = config["cutadapt"]["qual_cutoff"],
+        cut_5prime = config["cutadapt"]["cut_5prime"]
     conda:
         "../envs/cutadapt.yaml"
     threads:
         config["threads"]
     shell: """
-        (cutadapt --cut=5 --adapter=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --trim-n --cores={threads} --nextseq-trim={params.qual_cutoff} --minimum-length=6 --output={output.r1} --paired-output={output.r2} {input.r1} {input.r2}) &> {output.log}
+        (cutadapt --cut={params.cut_5prime} -U {params.cut_5prime} --adapter=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --trim-n --cores={threads} --nextseq-trim={params.qual_cutoff} --minimum-length=6 --output={output.r1} --paired-output={output.r2} {input.r1} {input.r2}) &> {output.log}
         """
 
