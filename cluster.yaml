@@ -47,7 +47,7 @@ protection_coverage:
 
 smoothed_midpoint_coverage:
     time : 3
-    mem : 75
+    mem : 125
 
 normalize_genome_coverage:
     time: 4
