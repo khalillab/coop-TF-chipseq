@@ -4,6 +4,6 @@ channels:
     - conda-forge
 
 dependencies:
-    - bowtie2=2.3.4.3=py36h2d50403_0
-    - samtools=1.9=h8ee4bcc_1
+    - bowtie2=2.3.5=py37he860b03_0
+    - samtools=1.9=h91753b0_8
 
