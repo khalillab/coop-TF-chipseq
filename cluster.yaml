@@ -33,17 +33,17 @@ get_fragment_lengths:
     mem: 600
 
 get_fragments:
-    time : 5
+    time : 15
     n : 2
-    mem : 1000
+    mem : 4000
 
 midpoint_coverage:
     time : 9
-    mem : 75
+    mem : 600
 
 protection_coverage:
     time : 5
-    mem : 75
+    mem : 600
 
 smoothed_midpoint_coverage:
     time : 3
@@ -52,6 +52,10 @@ smoothed_midpoint_coverage:
 normalize_genome_coverage:
     time: 6
     mem: 50
+
+subtract_inputs:
+    time: 5
+    mem: 40
 
 bedgraph_to_bigwig:
     time: 2

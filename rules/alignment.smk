@@ -3,8 +3,8 @@
 localrules:
     build_combined_genome,
     bowtie2_build,
+    index_bam,
 
-# basename = os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0]
 basename = "{exp_name}_{exp_fasta}_{si_name}_{si_fasta}".format(exp_name = config["genome"]["name"],
                                                                 exp_fasta = os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0],
                                                                 si_name = config["spike_in"]["name"],
@@ -77,14 +77,38 @@ rule align:
         mv fastq/unaligned/{wildcards.sample}_{FACTOR}-chipseq-unaligned.fastq.2.gz {output.unaligned_r2}
         """
 
-##indexing is required for separating species by samtools view
-#rule index_bam:
-#    input:
-#        f"alignment/{{sample}}_{FACTOR}-chipnexus-noPCRduplicates.bam"
-#    output:
-#        f"alignment/{{sample}}_{FACTOR}-chipnexus-noPCRduplicates.bam.bai"
-#    log : "logs/index_bam/index_bam-{sample}.log"
-#    shell: """
-#        (samtools index {input}) &> {log}
-#        """
+#indexing is required for separating species by samtools view
+rule index_bam:
+    input:
+        f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
+    output:
+        f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam.bai",
+    log:
+        "logs/index_bam/index_bam-{sample}.log"
+    shell: """
+        (samtools index {input}) &> {log}
+        """
+
+rule bam_separate_species:
+    input:
+        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
+        bai = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam.bai",
+        fasta = "{directory}/{bn}.fa".format(directory = os.path.split(os.path.abspath(config["genome"]["fasta"]))[0], bn=basename) if SISAMPLES else [],
+    output:
+        f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-{{species}}.bam",
+    params:
+        filterprefix = lambda wc: config["spike_in"]["name"] if wc.species=="experimental" else config["genome"]["name"],
+        prefix = lambda wc: config["genome"]["name"] if wc.species=="experimental" else config["spike_in"]["name"]
+    threads:
+        config["threads"]
+    log:
+        "logs/bam_separate_species/bam_separate_species-{sample}-{species}.log"
+    shell: """
+        (samtools view -h {input.bam} $(faidx {input.fasta} -i chromsizes | \
+                                        grep {params.prefix}_ | \
+                                        awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') | \
+         grep -v -e 'SN:{params.filterprefix}_' | \
+         sed 's/{params.prefix}_//g' | \
+         samtools view -bh -@ {threads} -o {output} -) &> {log}
+        """
 

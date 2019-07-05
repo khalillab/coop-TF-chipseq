@@ -50,7 +50,7 @@ wildcard_constraints:
     status = "all|passing",
     counttype= "counts|sicounts",
     norm = "counts|sicounts|libsizenorm|spikenorm",
-    strand = "|".join(list(itertools.chain.from_iterable([[x, x+"-input-subtracted"] for x in ["plus", "minus", "midpoints", "protection"]]))),
+    readtype = "|".join(list(itertools.chain.from_iterable([[x, x+"-input-subtracted"] for x in ["plus", "minus", "midpoints", "protection"]]))),
     windowsize = "\d+",
     direction = "all|up|unchanged|down",
     factor=FACTOR
@@ -107,7 +107,10 @@ rule all:
         #peakcalling
         # expand("peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.narrowPeak", group=GROUPS, factor=FACTOR),
         #genome coverage
-        # expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["sicounts","spikenorm"], sample=SISAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=CHIPS, readtype=["protection-input-subtracted", "midpoints-input-subtracted", "midpoints-input-subtracted_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["sicounts","spikenorm"], sample=CHIPS_SISAMPLES, readtype=["protection-input-subtracted", "midpoints-input-subtracted", "midpoints-input-subtracted_smoothed"], factor=FACTOR),
         #scatterplots
         # expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"]),
         #datavis
