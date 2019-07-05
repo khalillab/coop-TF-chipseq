@@ -1,13 +1,33 @@
 #!/usr/bin/env python
 
 localrules:
+    build_combined_genome,
     bowtie2_build,
 
-basename = os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0]
+# basename = os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0]
+basename = "{exp_name}_{exp_fasta}_{si_name}_{si_fasta}".format(exp_name = config["genome"]["name"],
+                                                                exp_fasta = os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0],
+                                                                si_name = config["spike_in"]["name"],
+                                                                si_fasta = os.path.splitext(os.path.basename(config["spike_in"]["fasta"]))[0]) if SISAMPLES else os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0]
+
+rule build_combined_genome:
+    input:
+        experimental = os.path.abspath(config["genome"]["fasta"]),
+        spikein = config["spike_in"]["fasta"] if SISAMPLES else []
+    output:
+        "{directory}/{bn}.fa".format(directory = os.path.split(os.path.abspath(config["genome"]["fasta"]))[0], bn=basename),
+    params:
+        exp_name = config["genome"]["name"],
+        si_name = config["spike_in"]["name"] if SISAMPLES else []
+    log: "logs/build_combined_genome.log"
+    shell: """
+        (sed 's/>/>{params.exp_name}_/g' {input.experimental} | \
+        cat - <(sed 's/>/>{params.si_name}_/g' {input.spikein}) > {output}) &> {log}
+        """
 
 rule bowtie2_build:
     input:
-        os.path.abspath(config["genome"]["fasta"]),
+        "{directory}/{bn}.fa".format(directory = os.path.split(os.path.abspath(config["genome"]["fasta"]))[0], bn=basename) if SISAMPLES else os.path.abspath(config["genome"]["fasta"]),
     output:
         expand(config["bowtie2"]["index-path"] + "/{{basename}}.{num}.bt2", num=[1,2,3,4]),
         expand(config["bowtie2"]["index-path"] + "/{{basename}}.rev.{num}.bt2", num=[1,2])

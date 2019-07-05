@@ -28,9 +28,9 @@ align:
     mem : 1000
 
 get_fragment_lengths:
-    time: 15
+    time: 30
     n: 4
-    mem: 300
+    mem: 600
 
 get_fragments:
     time : 5
@@ -38,11 +38,11 @@ get_fragments:
     mem : 1000
 
 midpoint_coverage:
-    time : 7
+    time : 9
     mem : 75
 
 protection_coverage:
-    time : 3
+    time : 5
     mem : 75
 
 smoothed_midpoint_coverage:
@@ -50,16 +50,16 @@ smoothed_midpoint_coverage:
     mem : 125
 
 normalize_genome_coverage:
-    time: 4
+    time: 6
     mem: 50
 
 bedgraph_to_bigwig:
     time: 2
-    mem: 2
+    mem: 50
 
 callpeaks_macs2:
     time : 15
-    mem : 400
+    mem : 800
 
 map_to_windows:
     time: 7
