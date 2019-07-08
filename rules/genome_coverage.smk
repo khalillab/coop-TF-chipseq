@@ -12,7 +12,7 @@ rule get_fragments:
     log:
         "logs/get_fragments/get_fragments_{sample}-{species}.log"
     shell: """
-        rm .{wildcards.sample}_{wildcards.species}*.bam
+        rm -f .{wildcards.sample}_{wildcards.species}*.bam
         (samtools sort -n -T .{wildcards.sample}_{wildcards.species} -@ {threads} {input.bam} | \
          bedtools bamtobed -bedpe -i stdin > {output}) &> {log}
         """
@@ -29,7 +29,7 @@ rule midpoint_coverage:
         (awk 'BEGIN{{FS=OFS="\t"}} {{width=$6-$2}} {{(width % 2 != 0)? (mid=(width+1)/2+$2) : ((rand()<0.5)? (mid=width/2+$2) : (mid=width/2+$2+1))}} {{print $1, mid, mid+1, $7}}' {input.bedpe} | \
          sort -k1,1 -k2,2n | \
          bedtools genomecov -i stdin -g <(faidx {input.fasta} -i chromsizes) -bga | \
-         sort -k1,1 -k2,2n > {output}) &> {log}
+         LC_COLLATE=C sort -k1,1 -k2,2n > {output}) &> {log}
         """
 
 rule protection_coverage:
@@ -41,7 +41,7 @@ rule protection_coverage:
         "logs/protection_coverage/protection_coverage_{sample}-{counttype}.log"
     shell: """
         (bedtools genomecov -ibam {input.bam} -bga -pc | \
-         sort -k1,1 -k2,2n > {output}) &> {log}
+         LC_COLLATE=C sort -k1,1 -k2,2n > {output}) &> {log}
         """
 
 rule normalize_genome_coverage:

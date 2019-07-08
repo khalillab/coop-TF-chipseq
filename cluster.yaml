@@ -8,7 +8,7 @@ __default__ :
     err : "logs/cluster/{rule}.{wildcards}.err"
 
 fastqc:
-    time : 4
+    time : 6
     n : 1
     mem : 250
 
@@ -33,12 +33,12 @@ get_fragment_lengths:
     mem: 600
 
 get_fragments:
-    time : 15
+    time : 10
     n : 2
-    mem : 4000
+    mem : 1000
 
 midpoint_coverage:
-    time : 9
+    time : 10
     mem : 600
 
 protection_coverage:
@@ -47,7 +47,7 @@ protection_coverage:
 
 smoothed_midpoint_coverage:
     time : 3
-    mem : 125
+    mem : 3000
 
 normalize_genome_coverage:
     time: 6
@@ -59,7 +59,7 @@ subtract_inputs:
 
 bedgraph_to_bigwig:
     time: 2
-    mem: 50
+    mem: 150
 
 callpeaks_macs2:
     time : 15

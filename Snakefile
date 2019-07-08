@@ -98,21 +98,24 @@ rule all:
         #require config file so that it gets archived
         "config.yaml",
         #fastqc
-        # f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_base_quality.svg',
+        f'qual_ctrl/fastqc/{FACTOR}_chipseq-per_base_quality.svg',
         #library processing summaries
-        # f"qual_ctrl/fragment_length_distributions/{FACTOR}_chipseq_fragment_length_distributions.svg",
-        # f"qual_ctrl/read_processing/{FACTOR}_chipseq_read_processing-loss.svg",
+        f"qual_ctrl/fragment_length_distributions/{FACTOR}_chipseq_fragment_length_distributions.svg",
+        f"qual_ctrl/read_processing/{FACTOR}_chipseq_read_processing-loss.svg",
         #alignment
         expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR),
         #peakcalling
-        # expand("peakcalling/macs/{group}/{group}_{factor}-chipseq_peaks.narrowPeak", group=GROUPS, factor=FACTOR),
+        expand("peakcalling/macs/{group}/{group}_{species}-{factor}-chipseq_peaks.narrowPeak", group=GROUPS, factor=FACTOR, species=["experimental", "spikein"]),
         #genome coverage
         expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
         expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["sicounts","spikenorm"], sample=SISAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"], factor=FACTOR),
-        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts","libsizenorm"], sample=CHIPS, readtype=["protection-input-subtracted", "midpoints-input-subtracted", "midpoints-input-subtracted_smoothed"], factor=FACTOR),
-        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["sicounts","spikenorm"], sample=CHIPS_SISAMPLES, readtype=["protection-input-subtracted", "midpoints-input-subtracted", "midpoints-input-subtracted_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["libsizenorm"], sample=CHIPS, readtype=["protection-input-subtracted", "midpoints-input-subtracted"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["spikenorm"], sample=CHIPS_SISAMPLES, readtype=["protection-input-subtracted", "midpoints-input-subtracted"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["counts"], sample=CHIPS, readtype=["midpoints-input-subtracted_smoothed"], factor=FACTOR),
+        expand("coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bw", norm=["sicounts"], sample=CHIPS_SISAMPLES, readtype=["midpoints-input-subtracted_smoothed"], factor=FACTOR),
         #scatterplots
-        # expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"]),
+        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"]),
+        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-spikenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups_si), control=conditioncheck(controlgroups_si)), factor=FACTOR, status=statuscheck(SISAMPLES, SIPASSING), windowsize=config["scatterplot_binsizes"]) if SISAMPLES and comparisons_si else [],
         #datavis
         # expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bygroup.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), figure=FIGURES, status=statuscheck(SAMPLES, PASSING), readtype=["protection", "midpoints"], factor=FACTOR) if config["plot_figures"] else []
 
