@@ -102,6 +102,7 @@ rule all:
         #library processing summaries
         f"qual_ctrl/fragment_length_distributions/{FACTOR}_chipseq_fragment_length_distributions.svg",
         f"qual_ctrl/read_processing/{FACTOR}_chipseq_read_processing-loss.svg",
+        expand("qual_ctrl/spikein/{factor}-chipseq_spikein-plots-{status}.svg", factor=FACTOR, status=statuscheck(SISAMPLES, SIPASSING)) if SISAMPLES else [],
         #alignment
         expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR),
         #peakcalling
@@ -117,5 +118,6 @@ rule all:
         expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, PASSING), windowsize=config["scatterplot_binsizes"]),
         expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-spikenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups_si), control=conditioncheck(controlgroups_si)), factor=FACTOR, status=statuscheck(SISAMPLES, SIPASSING), windowsize=config["scatterplot_binsizes"]) if SISAMPLES and comparisons_si else [],
         #datavis
-        # expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bygroup.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), figure=FIGURES, status=statuscheck(SAMPLES, PASSING), readtype=["protection", "midpoints"], factor=FACTOR) if config["plot_figures"] else []
+        expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), figure=FIGURES, status=statuscheck(SAMPLES, PASSING), readtype=["midpoints", "midpoints-input-subtracted", "protection", "protection-input-subtracted"], factor=FACTOR) if config["plot_figures"] else [],
+        expand(expand("datavis/{{figure}}/spikenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-spikenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg", zip, condition=conditioncheck(conditiongroups_si), control=conditioncheck(controlgroups_si)), figure=FIGURES, status=statuscheck(SISAMPLES, SIPASSING), readtype=["midpoints", "midpoints-input-subtracted", "protection", "protection-input-subtracted"], factor=FACTOR) if comparisons_si and config["plot_figures"] else [],
 

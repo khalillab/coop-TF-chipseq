@@ -1,13 +1,12 @@
 library(tidyverse)
 library(GGally)
 library(viridis)
-library(forcats)
 
 main = function(intable, factor, binsize, pcount, samplelist, outpath){
     df = intable %>% read_tsv() %>%
         gather(key=sample, value=signal, -name) %>%
         filter(sample %in% samplelist) %>%
-        mutate_at(vars(sample), funs(fct_inorder(., ordered=TRUE))) %>%
+        mutate_at(vars(sample), ~(fct_inorder(., ordered=TRUE))) %>%
         spread(sample, signal) %>%
         select(-name)
 
@@ -71,15 +70,15 @@ main = function(intable, factor, binsize, pcount, samplelist, outpath){
                     theme(plot.title = element_text(size=12, color="black", face="bold"),
                           axis.text = element_text(size=9),
                           strip.background = element_blank(),
-                          strip.text = element_text(size=10, color="black", face="bold"),
+                          strip.text = element_text(size=12, color="black", face="bold"),
                           strip.text.x = element_text(angle=15, hjust=1, vjust=1, size=8),
                           strip.text.y = element_text(angle=180, hjust=1),
                           strip.placement="outside",
                           strip.switch.pad.grid = unit(0, "points"),
                           strip.switch.pad.wrap = unit(0, "points"))
-    w = 3+ncol(df)*4
+    w = 3+ncol(df)*4.5
     h = 9/16*w+0.5
-    ggsave(outpath, mat, width=w, height=h, units="cm")
+    ggsave(outpath, mat, width=w, height=h, units="cm", limitsize=FALSE)
     print(warnings())
 }
 

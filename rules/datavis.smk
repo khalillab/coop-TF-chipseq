@@ -35,7 +35,7 @@ rule compute_matrix:
 
 rule cat_matrices:
     input:
-        lambda wc: expand("datavis/{figure}/{norm}/{annotation}_{sample}-{sampletype}-{norm}-{strand}-melted.tsv.gz", annotation=list(FIGURES[wc.figure]["annotations"].keys()), sample=CHIPS, sampletype=["ChIP", "input"], figure=wc.figure, norm=wc.norm, strand=wc.strand)
+        lambda wc: expand("datavis/{figure}/{norm}/{annotation}_{sample}-{sampletype}-{norm}-{strand}-melted.tsv.gz", annotation=list(FIGURES[wc.figure]["annotations"].keys()), sample=CHIPS if wc.norm=="libsizenorm" else CHIPS_SISAMPLES, sampletype=["ChIP"] + (["input"] if "-input-subtracted" not in wc.strand else []), figure=wc.figure, norm=wc.norm, strand=wc.strand)
     output:
         "datavis/{figure}/{norm}/{figure}-allsamples-allannotations-{factor}-chipseq-{norm}-{strand}.tsv.gz"
     log:
@@ -62,8 +62,9 @@ rule plot_figures:
         # abusing snakemake a bit here...using params as output paths since in order to use lambda functions
         annotations_out = lambda wc: ["datavis/{figure}/{norm}/{condition}-v-{control}/{status}/{readtype}/".format(**wc) + annotation + "_cluster-" + str(cluster) + ".bed" for annotation in FIGURES[wc.figure]["annotations"] for cluster in range(1, FIGURES[wc.figure]["annotations"][annotation]["n_clusters"]+1)],
         clusters_out = lambda wc: ["datavis/{figure}/{norm}/{condition}-v-{control}/{status}/{readtype}/".format(**wc) + annotation + ".pdf" for annotation in FIGURES[wc.figure]["annotations"]],
-        samplelist = lambda wc: get_samples(wc.status, [wc.condition, wc.control]),
+        samplelist = lambda wc: get_samples(wc.status, wc.norm, [wc.condition, wc.control]),
         plottype = lambda wc: FIGURES[wc.figure]["parameters"]["type"],
+        readtype = lambda wc: wc.readtype.split("-")[0] + ", input subtracted" if "subtracted" in wc.readtype else wc.readtype,
         upstream = lambda wc: FIGURES[wc.figure]["parameters"]["upstream"],
         dnstream = lambda wc: FIGURES[wc.figure]["parameters"]["dnstream"],
         scaled_length = lambda wc: 0 if FIGURES[wc.figure]["parameters"]["type"]=="absolute" else FIGURES[wc.figure]["parameters"]["scaled_length"],
