@@ -14,21 +14,22 @@ rule callpeaks_macs2:
         treat_bg = "peakcalling/macs/{group}/{group}_{species}-{factor}-chipseq_treat_pileup.bdg",
         cntrl_bg = "peakcalling/macs/{group}/{group}_{species}-{factor}-chipseq_control_lambda.bdg"
     params:
-        bw = config["macs2"]["bw"],
+        # bw = config["macs2"]["bw"],
         slocal = config["macs2"]["slocal"],
         llocal = config["macs2"]["llocal"],
         qscore = config["macs2"]["fdr"],
-        mfold_low = config["macs2"]["mfold_low"],
-        mfold_high = config["macs2"]["mfold_high"],
+        # mfold_low = config["macs2"]["mfold_low"],
+        # mfold_high = config["macs2"]["mfold_high"],
     conda:
         "../envs/macs2.yaml"
     log:
         "logs/macs2/macs2_{group}-{species}-{factor}.log"
     shell: """
-        (macs2 callpeak --treatment {input.chip_bam} --control {input.input_bam} --format BAMPE --name peakcalling/macs/{wildcards.group}/{wildcards.group}_{wildcards.species}-{wildcards.factor}-chipseq --SPMR --bw {params.bw} --mfold {params.mfold_low} {params.mfold_high} --gsize $(faidx {input.fasta} -i chromsizes | awk '{{sum += $2}} END {{print sum}}') --qvalue {params.qscore} --slocal {params.slocal} --llocal {params.llocal} --keep-dup auto --bdg --call-summits) &> {log}
+        (macs2 callpeak --treatment {input.chip_bam} --control {input.input_bam} --format BAMPE --name peakcalling/macs/{wildcards.group}/{wildcards.group}_{wildcards.species}-{wildcards.factor}-chipseq --SPMR --gsize $(faidx {input.fasta} -i chromsizes | awk '{{sum += $2}} END {{print sum}}') --qvalue {params.qscore} --slocal {params.slocal} --llocal {params.llocal} --keep-dup auto --bdg --call-summits) &> {log}
         (sed -i -e 's/peakcalling\/macs\/{wildcards.group}\///g' {output.peaks}) &>> {log}
         (sed -i -e 's/peakcalling\/macs\/{wildcards.group}\///g' {output.summits}) &>> {log}
         """
+        # (macs2 callpeak --treatment {input.chip_bam} --control {input.input_bam} --format BAMPE --name peakcalling/macs/{wildcards.group}/{wildcards.group}_{wildcards.species}-{wildcards.factor}-chipseq --SPMR --bw {params.bw} --mfold {params.mfold_low} {params.mfold_high} --gsize $(faidx {input.fasta} -i chromsizes | awk '{{sum += $2}} END {{print sum}}') --qvalue {params.qscore} --slocal {params.slocal} --llocal {params.llocal} --keep-dup auto --bdg --call-summits) &> {log}
 
 rule combine_peaks:
     input:
