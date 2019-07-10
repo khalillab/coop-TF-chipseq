@@ -29,14 +29,14 @@ def get_samples(search_dict=CHIPS,
                                                passing=passing,
                                                spikein=spikein,
                                                paired=False)}
-    if groups:
+    if groups and "all" not in groups:
         search_dict = {k:v for k,v in search_dict.items() if v["group"] in groups}
     return search_dict
 
 def statuscheck(dict1, dict2):
     if dict1 == dict2:
         if len(dict1) == 0:
-            return None
+            return []
         else:
             return ["passing"]
     else:
@@ -44,7 +44,7 @@ def statuscheck(dict1, dict2):
 
 def conditioncheck(conditionlist):
     if len(conditionlist) == 0:
-        return None
+        return []
     elif len(conditionlist) == 1:
         return conditionlist
     else:
