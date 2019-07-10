@@ -58,7 +58,7 @@ build_mean_sd_df_pre = function(dds){
         group_by(index) %>%
         summarise(mean = mean(signal),
                   sd = sd(signal)) %>%
-        mutate(rank = min_rank(desc(mean))) %>%
+        mutate(rank = min_rank(dplyr::desc(mean))) %>%
         return()
 }
 
@@ -68,7 +68,7 @@ build_mean_sd_df_post = function(counts){
         group_by(index) %>%
         summarise(mean = mean(signal),
                   sd = sd(signal)) %>%
-        mutate(rank = min_rank(desc(mean))) %>%
+        mutate(rank = min_rank(dplyr::desc(mean))) %>%
         return()
 }
 
@@ -365,7 +365,7 @@ main = function(exp_table,
                                    (sign(log2_foldchange)==sign(log2_foldchange_input)),
                                      -1, as.numeric(.), missing=as.numeric(.)))) %>%
         mutate(score = as.integer(score)) %>%
-        arrange(desc(log10_padj)) %>%
+        arrange(dplyr::desc(log10_padj)) %>%
         write_tsv(results_all_out)
 
     results_df_filtered_significant = results_df_filtered %>%

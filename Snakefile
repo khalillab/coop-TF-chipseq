@@ -78,8 +78,7 @@ wildcard_constraints:
     species = "experimental|spikein",
     read_status = "raw|cleaned|aligned|unaligned",
     figure = "|".join(re.escape(x) for x in FIGURES.keys()),
-    # annotation = "|".join(re.escape(x) for x in set(itertools.chain(*[FIGURES[figure]["annotations"].keys() for figure in FIGURES]))),
-    # annotation = "|".join(re.escape(x) for x in set(list(itertools.chain(*[FIGURES[figure]["annotations"].keys() for figure in FIGURES])) + list(config["differential_occupancy"]["annotations"].keys() if config["differential_occupancy"]["annotations"] else []) + ["peaks"])),
+    annotation = "|".join(re.escape(x) for x in set(list(itertools.chain(*[FIGURES[figure]["annotations"].keys() for figure in FIGURES])) + list(config["differential_occupancy"]["annotations"].keys() if config["differential_occupancy"]["annotations"] else []) + ["peaks"])),
     status = "all|passing",
     counttype= "counts|sicounts",
     norm = "counts|sicounts|libsizenorm|spikenorm",
@@ -96,7 +95,7 @@ include: "rules/peakcalling.smk"
 include: "rules/genome_coverage.smk"
 include: "rules/sample_similarity.smk"
 include: "rules/datavis.smk"
-# include: "rules/mnase-seq_differential_occupancy.smk"
+include: "rules/differential_binding.smk"
 
 onsuccess:
     shell("(./mogrify.sh) > mogrify.log")
@@ -196,5 +195,18 @@ rule all:
                readtype=["midpoints-input-subtracted", "protection-input-subtracted"],
                factor=FACTOR) if comparisons_si and config["plot_figures"] else [],
         # differential binding
-        # expand(f"diff_binding/peaks/{{condition}}-v-{{control}}/{{condition}}-v-{{control}}_experimental-{FACTOR}-peaks.bed", zip, condition=conditiongroups, control=controlgroups)
+        expand(expand("diff_binding/{{annotation}}/{condition}-v-{control}/libsizenorm/{condition}-v-{control}_{{factor}}-chipseq-libsizenorm-{{annotation}}-diffbind-results-all.tsv",
+                      zip,
+                      condition=conditiongroups,
+                      control=controlgroups),
+               annotation=list(config["differential_occupancy"]["annotations"].keys() \
+                       if config["differential_occupancy"]["annotations"] else [])+["peaks"],
+               factor=FACTOR),
+        expand(expand("diff_binding/{{annotation}}/{condition}-v-{control}/spikenorm/{condition}-v-{control}_{{factor}}-chipseq-spikenorm-{{annotation}}-diffbind-results-all.tsv",
+                       zip,
+                       condition=conditiongroups_si,
+                       control=controlgroups_si),
+               annotation=list(config["differential_occupancy"]["annotations"].keys() \
+                       if config["differential_occupancy"]["annotations"] else [])+["peaks"],
+               factor=FACTOR) if comparisons_si else []
 

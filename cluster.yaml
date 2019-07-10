@@ -89,3 +89,7 @@ plot_figures:
     time : 20
     mem : 12000
 
+differential_binding:
+    time: 3
+    mem: 1000
+

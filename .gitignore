@@ -8,7 +8,7 @@ qual_ctrl/
 coverage/
 datavis/
 peakcalling/
-/* diff_exp/ */
+diff_binding/
 
 snakemake.err
 snakemake.log

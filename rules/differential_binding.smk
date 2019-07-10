@@ -6,8 +6,10 @@ localrules:
 
 rule map_counts_to_annotations:
     input:
-        bed = lambda wc: "diff_binding/peaks/{condition}-v-{control}/{condition}-v-{control}_{species}-{factor}-peaks.bed" if wc.annotation=="peaks" else config["differential_occupancy"]["annotations"][wc.annotation],
-        bg = lambda wc: "coverage/counts/{sample}_{factor}-chipseq-counts-midpoints.bedgraph" if wc.species=="experimental" else "coverage/sicounts/{sample}_{factor}-chipseq-sicounts-midpoints.bedgraph"
+        bed = lambda wc: "diff_binding/peaks/{condition}-v-{control}/{condition}-v-{control}_{species}-{factor}-peaks.bed" if wc.annotation=="peaks" \
+                else config["differential_occupancy"]["annotations"][wc.annotation],
+        bg = lambda wc: "coverage/counts/{sample}_{factor}-chipseq-counts-midpoints.bedgraph" if wc.species=="experimental" else \
+                "coverage/sicounts/{sample}_{factor}-chipseq-sicounts-midpoints.bedgraph"
     output:
         temp("diff_binding/{annotation}/{condition}-v-{control}/{sample}_{species}-{factor}-chipseq-counts-{annotation}.tsv")
     log:
@@ -19,12 +21,12 @@ rule map_counts_to_annotations:
 
 rule combine_annotation_counts:
     input:
-        lambda wc: ["diff_binding/{annotation}/{condition}-v-{control}/".format(**wc) + x + f"_{wc.species}-{wc.factor}-chipseq-counts-{wc.annotation}.tsv" for x in get_samples("passing", "libsizenorm", [wc.control, wc.condition])]
+        lambda wc: ["diff_binding/{annotation}/{condition}-v-{control}/".format(**wc) + x + f"_{wc.species}-{wc.factor}-chipseq-counts-{wc.annotation}.tsv" for x in get_samples(search_dict=SAMPLES, passing=True, groups=[wc.control, wc.condition])]
     output:
         "diff_binding/{annotation}/{condition}-v-{control}/{condition}-v-{control}_allsamples-{species}-{factor}-chipseq-counts-{annotation}.tsv.gz"
     params:
-        n = lambda wc: 7*len(get_samples("passing", "libsizenorm", [wc.control, wc.condition])),
-        names = lambda wc: "\t".join(get_samples("passing", "libsizenorm", [wc.control, wc.condition]))
+        n = lambda wc: 7*len(get_samples(search_dict=SAMPLES, passing=True, groups=[wc.control, wc.condition])),
+        names = lambda wc: "\t".join(get_samples(search_dict=SAMPLES, passing=True, groups=[wc.control, wc.condition]).keys())
     log:
         "logs/combine_transcript_counts/combine_transcript_counts-{condition}-v-{control}-{species}-{annotation}-{factor}.log"
     shell: """
@@ -52,10 +54,20 @@ rule differential_binding:
         bed_unchanged = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-unchanged.bed",
         qc_plots = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-qcplots.svg",
     params:
-        chip_samples = lambda wc: [x for x in get_samples("passing", wc.norm, [wc.control, wc.condition]) if x in CHIPS],
-        input_samples = lambda wc: [x for x in get_samples("passing", wc.norm, [wc.control, wc.condition]) if x in INPUTS],
-        chip_groups = lambda wc: [CHIPS[x]["group"] for x in get_samples("passing", wc.norm, [wc.control, wc.condition]) if x in CHIPS],
-        input_groups = lambda wc: [INPUTS[x]["group"] for x in get_samples("passing", wc.norm, [wc.control, wc.condition]) if x in INPUTS],
+        chip_samples = lambda wc: [k for k,v in get_samples(passing=True,
+                                                            spikein=(True if wc.norm=="spikenorm" else False),
+                                                            groups=[wc.control, wc.condition]).items()],
+        input_samples = lambda wc: [k for k,v in get_samples(search_dict=INPUTS,
+                                                              passing=True,
+                                                              spikein=(True if wc.norm=="spikenorm" else False),
+                                                              groups=[wc.control, wc.condition]).items()],
+        chip_groups = lambda wc: [v["group"] for k,v in get_samples(passing=True,
+                                                                    spikein=(True if wc.norm=="spikenorm" else False),
+                                                                    groups=[wc.control, wc.condition]).items()],
+        input_groups = lambda wc: [v["group"] for k,v in get_samples(search_dict=INPUTS,
+                                                                     passing=True,
+                                                                     spikein=(True if wc.norm=="spikenorm" else False),
+                                                                     groups=[wc.control, wc.condition]).items()],
         alpha = config["differential_occupancy"]["fdr"],
         lfc = log2(config["differential_occupancy"]["fold-change-threshold"])
     conda:
