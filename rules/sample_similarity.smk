@@ -32,7 +32,10 @@ rule plot_scatter_plots:
         "qual_ctrl/scatter_plots/{condition}-v-{control}/{status}/{condition}-v-{control}_{factor}_chipseq-{norm}-scatterplots-{status}-window-{windowsize}.svg"
     params:
         pcount = lambda wc: 0.01*int(wc.windowsize),
-        samplelist = lambda wc: get_samples(wc.status, wc.norm, [wc.condition, wc.control])
+        samplelist = lambda wc: get_samples(search_dict=SAMPLES,
+                                            passing=(True if wc.status=="passing" else False),
+                                            spikein=(True if wc.norm=="spikenorm" else False),
+                                            groups=[wc.condition, wc.control])
     conda:
         "../envs/tidyverse.yaml"
     script:
