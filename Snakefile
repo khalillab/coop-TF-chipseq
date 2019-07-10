@@ -58,11 +58,15 @@ allgroups_si = [v["group"] for k,v in get_samples(passing=True, spikein=True, pa
 validgroups = set(z for z in allgroups if allgroups.count(z)>=2)
 validgroups_si = set(z for z in allgroups_si if allgroups_si.count(z)>=2)
 
+controlgroups_all = list(itertools.chain(*[d.values() for d in config["comparisons"]["libsizenorm"] if list(d.keys())[0] and list(d.values())[0] in allgroups]))
+conditiongroups_all = list(itertools.chain(*[d.keys() for d in config["comparisons"]["libsizenorm"] if list(d.keys())[0] and list(d.values())[0] in allgroups]))
 controlgroups = list(itertools.chain(*[d.values() for d in config["comparisons"]["libsizenorm"] if list(d.keys())[0] and list(d.values())[0] in validgroups]))
 conditiongroups = list(itertools.chain(*[d.keys() for d in config["comparisons"]["libsizenorm"] if list(d.keys())[0] and list(d.values())[0] in validgroups]))
 
 comparisons_si =  config["comparisons"]["spikenorm"]
 if comparisons_si:
+    controlgroups_si_all = list(itertools.chain(*[d.values() for d in config["comparisons"]["spikenorm"] if list(d.keys())[0] and list(d.values())[0] in allgroups_si]))
+    conditiongroups_si_all = list(itertools.chain(*[d.keys() for d in config["comparisons"]["spikenorm"] if list(d.keys())[0] and list(d.values())[0] in allgroups_si]))
     controlgroups_si = list(itertools.chain(*[d.values() for d in config["comparisons"]["spikenorm"] if list(d.keys())[0] and list(d.values())[0] in validgroups_si]))
     conditiongroups_si = list(itertools.chain(*[d.keys() for d in config["comparisons"]["spikenorm"] if list(d.keys())[0] and list(d.values())[0] in validgroups_si]))
 
@@ -108,25 +112,89 @@ rule all:
         #library processing summaries
         f"qual_ctrl/fragment_length_distributions/{FACTOR}_chipseq_fragment_length_distributions.svg",
         f"qual_ctrl/read_processing/{FACTOR}_chipseq_read_processing-loss.svg",
-        expand(f"qual_ctrl/spikein/{FACTOR}-chipseq_spikein-plots-{{status}}.svg", status=statuscheck(get_samples(spikein=True, paired=True), get_samples(passing=True, spikein=True, paired=True))),
+        expand(f"qual_ctrl/spikein/{FACTOR}-chipseq_spikein-plots-{{status}}.svg",
+               status=statuscheck(get_samples(spikein=True, paired=True),
+                                  get_samples(passing=True, spikein=True, paired=True))),
         #alignment
-        expand(f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam", sample=SAMPLES),
+        expand(f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
+                sample=SAMPLES),
         #peakcalling
-        expand(f"peakcalling/sample_peaks/{{sample}}_experimental-{FACTOR}-chipseq_peaks.narrowPeak", sample=get_samples(passing=True, paired=True)),
-        expand(f"peakcalling/sample_peaks/{{sample}}_spikein-{FACTOR}-chipseq_peaks.narrowPeak", sample=get_samples(passing=True, spikein=True, paired=True)),
-        expand(f"peakcalling/{{group}}/{{group}}_experimental-{FACTOR}-chipseq-idrpeaks.narrowPeak", group=validgroups),
-        expand(f"peakcalling/{{group}}/{{group}}_spikein-{FACTOR}-chipseq-idrpeaks.narrowPeak", group=validgroups_si),
+        expand(f"peakcalling/sample_peaks/{{sample}}_experimental-{FACTOR}-chipseq_peaks.narrowPeak",
+                sample=get_samples(passing=True, paired=True)),
+        expand(f"peakcalling/sample_peaks/{{sample}}_spikein-{FACTOR}-chipseq_peaks.narrowPeak",
+                sample=get_samples(passing=True, spikein=True, paired=True)),
+        expand(f"peakcalling/{{group}}/{{group}}_experimental-{FACTOR}-chipseq-idrpeaks.narrowPeak",
+                group=validgroups),
+        expand(f"peakcalling/{{group}}/{{group}}_spikein-{FACTOR}-chipseq-idrpeaks.narrowPeak",
+                group=validgroups_si),
         #genome coverage
-        expand(f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw", norm=["counts","libsizenorm"], sample=SAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"]),
-        expand(f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw", norm=["sicounts","spikenorm"], sample=SISAMPLES, readtype=["protection", "midpoints", "midpoints_smoothed"]),
-        expand(f"coverage/libsizenorm/{{sample}}_{FACTOR}-chipseq-libsizenorm-{{readtype}}.bw", sample=get_samples(paired=True), readtype=["protection-input-subtracted", "midpoints-input-subtracted", "midpoints-input-subtracted_smoothed"]),
-        expand(f"coverage/spikenorm/{{sample}}_{FACTOR}-chipseq-spikenorm-{{readtype}}.bw", sample=get_samples(spikein=True, paired=True), readtype=["protection-input-subtracted", "midpoints-input-subtracted", "midpoints-input-subtracted_smoothed"]),
+        expand(f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw",
+                norm=["counts","libsizenorm"],
+                sample=SAMPLES,
+                readtype=["protection", "midpoints", "midpoints_smoothed"]),
+        expand(f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw",
+                norm=["sicounts","spikenorm"],
+                sample=SISAMPLES,
+                readtype=["protection", "midpoints", "midpoints_smoothed"]),
+        expand(f"coverage/libsizenorm/{{sample}}_{FACTOR}-chipseq-libsizenorm-{{readtype}}.bw",
+                sample=get_samples(paired=True),
+                readtype=["protection-input-subtracted",
+                          "midpoints-input-subtracted",
+                          "midpoints-input-subtracted_smoothed"]),
+        expand(f"coverage/spikenorm/{{sample}}_{FACTOR}-chipseq-spikenorm-{{readtype}}.bw",
+                sample=get_samples(spikein=True, paired=True),
+                readtype=["protection-input-subtracted",
+                          "midpoints-input-subtracted",
+                          "midpoints-input-subtracted_smoothed"]),
         #scatterplots
-        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), factor=FACTOR, status=statuscheck(SAMPLES, get_samples(search_dict=SAMPLES, passing=True)), windowsize=config["scatterplot_binsizes"]),
-        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-spikenorm-scatterplots-{{status}}-window-{{windowsize}}.svg", zip, condition=conditioncheck(conditiongroups_si), control=conditioncheck(controlgroups_si)), factor=FACTOR, status=statuscheck(SISAMPLES, get_samples(search_dict=SISAMPLES, passing=True)), windowsize=config["scatterplot_binsizes"]) if comparisons_si else [],
+        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-libsizenorm-scatterplots-{{status}}-window-{{windowsize}}.svg",
+                      zip,
+                      condition=conditioncheck(conditiongroups_all),
+                      control=conditioncheck(controlgroups_all)),
+               factor=FACTOR,
+               status=statuscheck(SAMPLES, get_samples(search_dict=SAMPLES, passing=True)),
+               windowsize=config["scatterplot_binsizes"]),
+        expand(expand("qual_ctrl/scatter_plots/{condition}-v-{control}/{{status}}/{condition}-v-{control}_{{factor}}_chipseq-spikenorm-scatterplots-{{status}}-window-{{windowsize}}.svg",
+                      zip,
+                      condition=conditioncheck(conditiongroups_si_all),
+                      control=conditioncheck(controlgroups_si_all)),
+               factor=FACTOR,
+               status=statuscheck(SISAMPLES, get_samples(search_dict=SISAMPLES, passing=True)),
+               windowsize=config["scatterplot_binsizes"]) if comparisons_si else [],
         #datavis
-        # expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg", zip, condition=conditioncheck(conditiongroups), control=conditioncheck(controlgroups)), figure=FIGURES, status=statuscheck(SAMPLES, get_samples(search_dict=SAMPLES, passing=True)), readtype=["midpoints", "midpoints-input-subtracted", "protection", "protection-input-subtracted"], factor=FACTOR) if config["plot_figures"] else [],
-        # expand(expand("datavis/{{figure}}/spikenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-spikenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg", zip, condition=conditioncheck(conditiongroups_si), control=conditioncheck(controlgroups_si)), figure=FIGURES, status=statuscheck(SISAMPLES, SIPASSING), readtype=["midpoints", "midpoints-input-subtracted", "protection", "protection-input-subtracted"], factor=FACTOR) if comparisons_si and config["plot_figures"] else [],
+        expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg",
+                      zip,
+                      condition=conditioncheck(conditiongroups_all),
+                      control=conditioncheck(controlgroups_all)),
+               figure=FIGURES,
+               status=statuscheck(CHIPS, get_samples(passing=True)),
+               readtype=["midpoints", "protection"],
+               factor=FACTOR) if config["plot_figures"] else [],
+        expand(expand("datavis/{{figure}}/libsizenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-libsizenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg",
+                      zip,
+                      condition=conditioncheck(conditiongroups_all),
+                      control=conditioncheck(controlgroups_all)),
+               figure=FIGURES,
+               status=statuscheck(get_samples(paired=True), get_samples(passing=True, paired=True)),
+               readtype=["midpoints-input-subtracted", "protection-input-subtracted"],
+               factor=FACTOR) if config["plot_figures"] else [],
+        expand(expand("datavis/{{figure}}/spikenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-spikenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg",
+                      zip,
+                      condition=conditioncheck(conditiongroups_si_all),
+                      control=conditioncheck(controlgroups_si_all)),
+               figure=FIGURES,
+               status=statuscheck(get_samples(spikein=True), get_samples(passing=True, spikein=True)),
+               readtype=["midpoints", "protection"],
+               factor=FACTOR) if comparisons_si and config["plot_figures"] else [],
+        expand(expand("datavis/{{figure}}/spikenorm/{condition}-v-{control}/{{status}}/{{readtype}}/{{factor}}-chipseq_{{figure}}-spikenorm-{{status}}_{condition}-v-{control}_{{readtype}}-heatmap-bysample.svg",
+                      zip,
+                      condition=conditioncheck(conditiongroups_si_all),
+                      control=conditioncheck(controlgroups_si_all)),
+               figure=FIGURES,
+               status=statuscheck(get_samples(spikein=True, paired=True),
+                                  get_samples(passing=True, spikein=True, paired=True)),
+               readtype=["midpoints-input-subtracted", "protection-input-subtracted"],
+               factor=FACTOR) if comparisons_si and config["plot_figures"] else [],
         # differential binding
         # expand(f"diff_binding/peaks/{{condition}}-v-{{control}}/{{condition}}-v-{{control}}_experimental-{FACTOR}-peaks.bed", zip, condition=conditiongroups, control=controlgroups)
 
