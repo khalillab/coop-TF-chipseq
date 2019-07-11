@@ -40,38 +40,36 @@ rule differential_binding:
         exp_counts = "diff_binding/{annotation}/{condition}-v-{control}/{condition}-v-{control}_allsamples-experimental-{factor}-chipseq-counts-{annotation}.tsv.gz",
         spike_counts = lambda wc: [] if wc.norm=="libsizenorm" else "diff_binding/peaks/{condition}-v-{control}/{condition}-v-{control}_allsamples-spikein-{factor}-chipseq-counts-peaks.tsv.gz"
     output:
-        counts_norm_chip = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-ChIP-counts-sizefactornorm.tsv",
-        counts_norm_input = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-input-counts-sizefactornorm.tsv",
-        counts_rlog_chip = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-ChIP-counts-rlogtransform.tsv",
-        counts_rlog_input = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-input-counts-rlogtransform.tsv",
+        counts_norm = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-chipseq-counts-sizefactornorm.tsv",
+        counts_rlog = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-chipseq-counts-rlogtransform.tsv",
         results_all = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-all.tsv",
         results_up = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-up.tsv",
         results_down = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-down.tsv",
-        results_unchanged = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-unchanged.tsv",
+        results_nonsig = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-nonsignificant.tsv",
         bed_all = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-all.bed",
         bed_up = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-up.bed",
         bed_down = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-down.bed",
-        bed_unchanged = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-unchanged.bed",
+        bed_nonsig = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-results-nonsignificant.bed",
         qc_plots = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-diffbind-qcplots.svg",
     params:
-        chip_samples = lambda wc: [k for k,v in get_samples(passing=True,
-                                                            spikein=(True if wc.norm=="spikenorm" else False),
-                                                            groups=[wc.control, wc.condition]).items()],
-        input_samples = lambda wc: [k for k,v in get_samples(search_dict=INPUTS,
-                                                              passing=True,
-                                                              spikein=(True if wc.norm=="spikenorm" else False),
-                                                              groups=[wc.control, wc.condition]).items()],
-        chip_groups = lambda wc: [v["group"] for k,v in get_samples(passing=True,
-                                                                    spikein=(True if wc.norm=="spikenorm" else False),
-                                                                    groups=[wc.control, wc.condition]).items()],
-        input_groups = lambda wc: [v["group"] for k,v in get_samples(search_dict=INPUTS,
-                                                                     passing=True,
-                                                                     spikein=(True if wc.norm=="spikenorm" else False),
-                                                                     groups=[wc.control, wc.condition]).items()],
+        samples = lambda wc: list(get_samples(search_dict=SAMPLES,
+                                              passing=True,
+                                              spikein=(True if wc.norm=="spikenorm" else False),
+                                              groups=[wc.control, wc.condition]).keys()),
+        conditions = lambda wc: [v["group"] for k,v in get_samples(search_dict=SAMPLES,
+                                                                  passing=True,
+                                                                  spikein=(True if wc.norm=="spikenorm" else False),
+                                                                  groups=[wc.control, wc.condition]).items()],
+        sampletypes = lambda wc: [("input" if k in INPUTS else "ChIP") \
+                                    for k in get_samples(search_dict=SAMPLES,
+                                                         passing=True,
+                                                         spikein=(True if wc.norm=="spikenorm" else False),
+                                                         groups=[wc.control, wc.condition]).keys()],
         alpha = config["differential_occupancy"]["fdr"],
         lfc = log2(config["differential_occupancy"]["fold-change-threshold"])
     conda:
         "../envs/diff_exp.yaml"
     script:
-        "../scripts/differential_binding.R"
+        "../scripts/differential_binding_chipseq.R"
+
 
