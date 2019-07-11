@@ -84,7 +84,7 @@ wildcard_constraints:
     norm = "counts|sicounts|libsizenorm|spikenorm",
     readtype = "|".join(list(itertools.chain.from_iterable([[x, x+"-input-subtracted"] for x in ["plus", "minus", "midpoints", "protection"]]))),
     windowsize = "\d+",
-    direction = "all|up|unchanged|down",
+    direction = "all|up|nonsignificant|down",
     factor=FACTOR
 
 include: "rules/clean_reads.smk"
@@ -195,18 +195,20 @@ rule all:
                readtype=["midpoints-input-subtracted", "protection-input-subtracted"],
                factor=FACTOR) if comparisons_si and config["plot_figures"] else [],
         # differential binding
-        expand(expand("diff_binding/{{annotation}}/{condition}-v-{control}/libsizenorm/{condition}-v-{control}_{{factor}}-chipseq-libsizenorm-{{annotation}}-diffbind-results-all.tsv",
+        expand(expand("diff_binding/{{annotation}}/{condition}-v-{control}/libsizenorm/{condition}-v-{control}_{{factor}}-chipseq-libsizenorm-{{annotation}}-diffbind-results-{{direction}}.narrowpeak",
                       zip,
                       condition=conditiongroups,
                       control=controlgroups),
                annotation=list(config["differential_occupancy"]["annotations"].keys() \
                        if config["differential_occupancy"]["annotations"] else [])+["peaks"],
+               direction=["all", "down", "nonsignificant", "up"],
                factor=FACTOR),
-        expand(expand("diff_binding/{{annotation}}/{condition}-v-{control}/spikenorm/{condition}-v-{control}_{{factor}}-chipseq-spikenorm-{{annotation}}-diffbind-results-all.tsv",
+        expand(expand("diff_binding/{{annotation}}/{condition}-v-{control}/spikenorm/{condition}-v-{control}_{{factor}}-chipseq-spikenorm-{{annotation}}-diffbind-results-{{direction}}.narrowpeak",
                        zip,
                        condition=conditiongroups_si,
                        control=controlgroups_si),
                annotation=list(config["differential_occupancy"]["annotations"].keys() \
                        if config["differential_occupancy"]["annotations"] else [])+["peaks"],
+               direction=["all", "down", "nonsignificant", "up"],
                factor=FACTOR) if comparisons_si else []
 

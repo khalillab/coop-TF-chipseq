@@ -93,3 +93,8 @@ differential_binding:
     time: 3
     mem: 1000
 
+diffbind_results_to_narrowpeak:
+    time: 2
+    mem: 600
+
+

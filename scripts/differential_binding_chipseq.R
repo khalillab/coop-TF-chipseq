@@ -230,10 +230,10 @@ main = function(exp_table="high-affinity-ZF-v-reporter-only_allsamples-experimen
                 results_up_out="results_up.tsv",
                 results_down_out="results_down.tsv",
                 results_unchanged_out="results_unch.tsv",
-                bed_all_out="all.bed",
-                bed_up_out="up.bed",
-                bed_down_out="down.bed",
-                bed_unchanged_out="nonsignificant.bed",
+                # bed_all_out="all.bed",
+                # bed_up_out="up.bed",
+                # bed_down_out="down.bed",
+                # bed_unchanged_out="nonsignificant.bed",
                 qc_plots_out="qcplots.png"){
 
     annotations = read_tsv(exp_table) %>%
@@ -357,30 +357,32 @@ main = function(exp_table="high-affinity-ZF-v-reporter-only_allsamples-experimen
     results_df %<>%
         select(-index) %>%
         write_tsv(results_all_out)
-    results_df %>%
-        select(1:6) %>%
-        write_tsv(bed_all_out, col_names=FALSE)
+    # results_df %>%
+    #     select(1:6) %>%
+    #     write_tsv(bed_all_out, col_names=FALSE)
 
     results_df_significant = results_df %>%
         filter(log10_padj > -log10(alpha))
     results_df_nonsignificant = results_df %>%
         filter(log10_padj <= -log10(alpha)) %>%
         write_tsv(results_unchanged_out)
-    results_df_nonsignificant %>%
-        select(1:6) %>%
-        write_tsv(bed_unchanged_out, col_names=FALSE)
+    # results_df_nonsignificant %>%
+    #     select(1:6) %>%
+    #     write_tsv(bed_unchanged_out, col_names=FALSE)
 
     results_df_significant %>%
         filter(log2FC_enrichment >= 0) %>%
-        write_tsv(results_up_out) %>%
-        select(1:6) %>%
-        write_tsv(bed_up_out, col_names=FALSE)
+        write_tsv(results_up_out)
+        # write_tsv(results_up_out) %>%
+        # select(1:6) %>%
+        # write_tsv(bed_up_out, col_names=FALSE)
 
     results_df_significant %>%
         filter(log2FC_enrichment < 0) %>%
-        write_tsv(results_down_out) %>%
-        select(1:6) %>%
-        write_tsv(bed_down_out, col_names=FALSE)
+        write_tsv(results_down_out)
+        # write_tsv(results_down_out) %>%
+        # select(1:6) %>%
+        # write_tsv(bed_down_out, col_names=FALSE)
 
     maplot = plot_ma(df_sig = results_df_significant,
                      df_nonsig = results_df_nonsignificant,
@@ -427,9 +429,9 @@ main(exp_table = snakemake@input[["exp_counts"]],
      results_up_out = snakemake@output[["results_up"]],
      results_down_out = snakemake@output[["results_down"]],
      results_unchanged_out = snakemake@output[["results_nonsig"]],
-     bed_all_out = snakemake@output[["bed_all"]],
-     bed_up_out = snakemake@output[["bed_up"]],
-     bed_down_out = snakemake@output[["bed_down"]],
-     bed_unchanged_out = snakemake@output[["bed_nonsig"]],
+     # bed_all_out = snakemake@output[["bed_all"]],
+     # bed_up_out = snakemake@output[["bed_up"]],
+     # bed_down_out = snakemake@output[["bed_down"]],
+     # bed_unchanged_out = snakemake@output[["bed_nonsig"]],
      qc_plots_out = snakemake@output[["qc_plots"]])
 
