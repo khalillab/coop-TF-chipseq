@@ -15,7 +15,8 @@ rule map_counts_to_annotations:
     log:
         "logs/map_counts_to_annotations/map_counts_to_annotations-{condition}-v-{control}-{sample}-{species}-{annotation}-{factor}.log"
     shell: """
-        (LC_COLLATE=C sort -k1,1 -k2,2n {input.bed} | \
+        (cut -f1-6 {input.bed} | \
+         LC_COLLATE=C sort -k1,1 -k2,2n | \
          bedtools map -a stdin -b {input.bg} -c 4 -o sum > {output}) &> {log}
         """
 

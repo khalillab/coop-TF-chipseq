@@ -96,6 +96,7 @@ include: "rules/genome_coverage.smk"
 include: "rules/sample_similarity.smk"
 include: "rules/datavis.smk"
 include: "rules/differential_binding.smk"
+include: "rules/motifs.smk"
 
 onsuccess:
     shell("(./mogrify.sh) > mogrify.log")
@@ -210,5 +211,21 @@ rule all:
                annotation=list(config["differential_occupancy"]["annotations"].keys() \
                        if config["differential_occupancy"]["annotations"] else [])+["peaks"],
                direction=["all", "down", "nonsignificant", "up"],
-               factor=FACTOR) if comparisons_si else []
+               factor=FACTOR) if comparisons_si else [],
+        expand(expand("motifs/{{annotation}}/{condition}-v-{control}/libsizenorm/{condition}-v-{control}_{{factor}}-chipseq-libsizenorm-{{annotation}}-diffbind-results-{{direction}}-meme_chip/summary.tsv",
+                       zip,
+                       condition=conditiongroups,
+                       control=controlgroups),
+               annotation=list(config["differential_occupancy"]["annotations"].keys() \
+                       if config["differential_occupancy"]["annotations"] else [])+["peaks"],
+               direction=["all", "down", "nonsignificant", "up"],
+               factor=FACTOR) if config["motifs"]["meme-chip"]["run-meme-chip"] else [],
+        expand(expand("motifs/{{annotation}}/{condition}-v-{control}/spikenorm/{condition}-v-{control}_{{factor}}-chipseq-spikenorm-{{annotation}}-diffbind-results-{{direction}}-meme_chip/summary.tsv",
+                       zip,
+                       condition=conditiongroups_si,
+                       control=controlgroups_si),
+               annotation=list(config["differential_occupancy"]["annotations"].keys() \
+                       if config["differential_occupancy"]["annotations"] else [])+["peaks"],
+               direction=["all", "down", "nonsignificant", "up"],
+               factor=FACTOR) if comparisons_si and config["motifs"]["meme-chip"]["run-meme-chip"] else [],
 

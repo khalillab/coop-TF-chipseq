@@ -97,4 +97,10 @@ diffbind_results_to_narrowpeak:
     time: 2
     mem: 600
 
+meme_chip:
+    time: 150
+    mem: 600
+    n: 1
+
+
 
