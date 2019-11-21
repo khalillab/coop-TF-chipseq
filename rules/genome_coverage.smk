@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+localrules:
+    normalize_genome_coverage,
+    subtract_inputs,
+    bedgraph_to_bigwig
+
 # bam must be sorted by name for bedpe.
 # Not doing this in the bowtie step is an artifact of samtools indexing required position-sorted bam for splitting species in workflows with spike-ins.
 rule get_fragments:

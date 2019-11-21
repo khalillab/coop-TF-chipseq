@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 localrules:
+    compute_matrix,
     cat_matrices
 
 rule compute_matrix:
