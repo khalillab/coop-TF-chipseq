@@ -31,7 +31,7 @@ rule idr:
     input:
         #NOTE: for now we take the first two samples since the IDR script only takes two
         #change this if we find a better way to aggregate results
-        lambda wc: ["peakcalling/sample_peaks/" + x + "_{species}-{factor}-chipseq_peaks.narrowPeak".format(**wc) for x in get_samples(passing=True, paired=True) if get_samples(passing=True, paired=True)[x]['group']==wc.group][0:2]
+        lambda wc: ["peakcalling/sample_peaks/" + x + "_{species}-{factor}-chipseq_peaks.narrowPeak".format(**wc) for x in get_samples(passing=True, paired=True, groups=wc.group)][0:2]
     output:
         allpeaks = "peakcalling/{group}/{group}_{species}-{factor}-chipseq-idrpeaks-all.tsv",
         filtered = "peakcalling/{group}/{group}_{species}-{factor}-chipseq-idrpeaks-filtered.tsv",

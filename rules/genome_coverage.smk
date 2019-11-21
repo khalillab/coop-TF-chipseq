@@ -61,7 +61,9 @@ rule normalize_genome_coverage:
     run:
         if wildcards.norm=="libsizenorm" or wildcards.sample in INPUTS:
             shell("""
-                  (awk -v norm_factor=$(samtools view -c {input.bam_experimental} | paste -d "" - <(echo "/1000000") | bc -l) 'BEGIN{{FS=OFS="\t"}}{{$4=$4/norm_factor; print $0}}' {input.counts} > {output.normalized}) &> {log}
+                  (awk -v norm_factor=$(samtools view -c {input.bam_experimental} | \
+                                        paste -d "" - <(echo "/1000000") | bc -l) \
+                   'BEGIN{{FS=OFS="\t"}}{{$4=$4/norm_factor; print $0}}' {input.counts} > {output.normalized}) &> {log}
                   """)
         else:
             shell("""

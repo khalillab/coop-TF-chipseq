@@ -94,3 +94,11 @@ rule plot_spikein_pct:
         plot = f"qual_ctrl/spikein/{FACTOR}-chipseq_spikein-plots-{{status}}.svg",
         stats = f"qual_ctrl/spikein/{FACTOR}-chipseq_spikein-stats-{{status}}.tsv"
     params:
+        samplelist = lambda wc: get_samples(passing=(True if wc.status=="passing" else False), spikein=True, paired=True).keys(),
+        conditions = conditiongroups_si if comparisons_si else [],
+        controls = controlgroups_si if comparisons_si else []
+    conda:
+        "../envs/tidyverse.yaml"
+    script:
+        "../scripts/spikein_abundance_chipseq.R"
+
