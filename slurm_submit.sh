@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH -p short
-#SBATCH -t 2:00:00
-#SBATCH --mem-per-cpu=1400M
-#SBATCH -c 1
+#SBATCH -t 6:00:00
+#SBATCH --mem-per-cpu=400M
+#SBATCH -c 8
 #SBATCH -e snakemake.err
 #SBATCH -o snakemake.log
 #SBATCH -J khalil-chipseq
