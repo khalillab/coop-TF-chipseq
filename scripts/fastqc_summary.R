@@ -140,7 +140,7 @@ main = function(seq_len_dist_in, per_tile_in, per_base_qual_in,
         geom_line() +
         scale_color_ptol(guide=guide_legend(label.position="top", label.hjust=0.5,
                                             keyheight=0.2)) +
-        scale_x_continuous(expand=c(0,0), name="position in read", breaks=scales::pretty_breaks(n=6)) +
+        scale_x_continuous(expand=c(0,1), name="position in read", breaks=scales::pretty_breaks(n=6)) +
         scale_y_continuous(name="% of reads", breaks=scales::pretty_breaks(n=2)) +
         facet_grid(sample~status, switch="y") +
         ggtitle("per base sequence content") +
