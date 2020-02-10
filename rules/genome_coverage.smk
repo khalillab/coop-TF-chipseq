@@ -31,7 +31,7 @@ rule midpoint_coverage:
     log:
         "logs/midpoint_coverage/midpoint_coverage_{sample}-{counttype}.log"
     shell: """
-        (awk 'BEGIN{{FS=OFS="\t"}} {{width=$6-$2}} {{(width % 2 != 0)? (mid=(width+1)/2+$2) : ((rand()<0.5)? (mid=width/2+$2) : (mid=width/2+$2+1))}} {{print $1, mid, mid+1, $7}}' {input.bedpe} | \
+        (awk 'BEGIN{{FS=OFS="\t"}} {{width=$6-$2}} {{(width % 2 != 0) ? (mid=(width+1)/2+$2) : ((rand()<0.5)? (mid=width/2+$2) : (mid=width/2+$2+1))}} width>0 {{print $1, mid, mid+1, $7}}' {input.bedpe} | \
          sort -k1,1 -k2,2n | \
          bedtools genomecov -i stdin -g <(faidx {input.fasta} -i chromsizes) -bga | \
          LC_COLLATE=C sort -k1,1 -k2,2n > {output}) &> {log}
