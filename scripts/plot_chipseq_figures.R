@@ -35,7 +35,7 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
             heatmap_base = heatmap_base +
                 geom_raster(aes(x=position, y=new_index, fill=log2(cpm+pcount)), interpolate=FALSE) +
                 scale_fill_viridis(option = cmap,
-                                   name = bquote(bold(log[2] ~ .(factorlabel) ~ "ChIP-seq" ~ .(readtype))),
+                                   name = bquote(log[2] ~ .(factorlabel) ~ "ChIP-seq" ~ .(readtype)),
                                    limits = c(NA, flimit), oob=scales::squish,
                                    guide=guide_colorbar(title.position="top",
                                                         barwidth=20,
@@ -54,18 +54,18 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
         heatmap_base = heatmap_base +
             scale_y_reverse(expand=c(0.005,5), breaks=hmap_ybreaks) +
             theme_minimal() +
-            theme(text = element_text(size=16, face="bold", color="black"),
+            theme(text = element_text(size=16, face="plain", color="black"),
                   legend.position = "top",
-                  legend.title = element_text(size=16, face="bold", color="black"),
+                  legend.title = element_text(size=16, face="plain", color="black"),
                   legend.text = element_text(size=12, face="plain"),
                   legend.margin = margin(0,0,0,0),
                   legend.box.margin = margin(0,0,0,0),
-                  strip.text.x = element_text(size=16, face="bold", color="black"),
+                  strip.text.x = element_text(size=16, face="plain", color="black"),
                   axis.ticks.length = unit(0.125, "cm"),
                   axis.ticks = element_line(size=1.5),
                   axis.ticks.y = element_blank(),
                   axis.text.y = element_blank(),
-                  axis.text.x = element_text(size=16, face="bold", color="black", margin = unit(c(3,0,0,0),"pt")),
+                  axis.text.x = element_text(size=16, face="plain", color="black", margin = unit(c(3,0,0,0),"pt")),
                   axis.title.x = element_text(size=12, face="plain"),
                   axis.title.y = element_blank(),
                   panel.grid.major.x = element_line(color="black", size=1.5),
@@ -134,11 +134,11 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
                 geom_vline(xintercept = scaled_length/1000, size=1, color="grey65")
         }
 
-        if (str_detect(readtype, "subtracted")){
+        if (readtype=="enrichment"){
             metagene = metagene +
                 geom_ribbon(aes(ymin=low,
                                 ymax=high),
-                            size=0, alpha=0.4) +
+                            size=0, alpha=0.2) +
             geom_line(aes(y=mid))
         } else {
             metagene = metagene +
@@ -151,26 +151,30 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
             scale_linetype_manual(values = c("dashed", "solid"),
                                   guide=guide_legend(label.position=ifelse(groupvar %in% c("sampleanno", "groupanno"), "right", "top"),
                                                      label.hjust=ifelse(groupvar %in% c("sampleanno", "groupanno"), 0, 0.5))) +
-            scale_alpha_manual(values=c(0.1, 0.4),
+            scale_alpha_manual(values=c(0.05, 0.2),
                                guide=guide_legend(label.position=ifelse(groupvar %in% c("sampleanno", "groupanno"), "right", "top"),
                                                   label.hjust=ifelse(groupvar %in% c("sampleanno", "groupanno"), 0, 0.5)))
         }
 
         metagene = metagene +
-            scale_y_continuous(limits = c(NA, NA), name="normalized counts",
-                               labels=function(x) abs(x)) +
+            scale_y_continuous(limits = c(NA, NA),
+                               name=ifelse(readtype=="enrichment",
+                                           expression(textstyle(frac("IP", "input"))),
+                                           "normalized counts")) +
+            # scale_color_manual(values=rep(ptol_pal()(min(n_groups, 12)), ceiling(n_groups/12)),
             scale_color_ptol(guide=guide_legend(label.position=ifelse(groupvar %in% c("sampleanno", "groupanno"), "right", "top"),
                                                 label.hjust=ifelse(groupvar %in% c("sampleanno", "groupanno"), 0, 0.5))) +
+            # scale_fill_manual(values=rep(ptol_pal()(min(n_groups, 12)), ceiling(n_groups/12))) +
             scale_fill_ptol() +
             ggtitle(paste(factorlabel, "ChIP-seq", readtype)) +
             theme_light() +
-            theme(text = element_text(size=12, color="black", face="bold"),
+            theme(text = element_text(size=12, color="black", face="plain"),
                   axis.text = element_text(size=12, color="black"),
                   axis.text.y = element_text(size=10, face="plain"),
                   axis.title = element_text(size=10, face="plain"),
                   strip.placement="outside",
                   strip.background = element_blank(),
-                  strip.text = element_text(size=12, color="black", face="bold"),
+                  strip.text = element_text(size=12, color="black", face="plain"),
                   legend.text = element_text(size=12),
                   legend.title = element_blank(),
                   legend.position = ifelse(groupvar %in% c("sampleanno", "groupanno"), "bottom", "top"),
@@ -494,15 +498,15 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
     if (n_anno==1 && max(k)==1){
         heatmap_sample = heatmap_sample +
                 ylab(annotations[1]) +
-                theme(axis.title.y = element_text(size=16, face="bold", color="black", angle=90),
-                      strip.text.y = element_text(size=16, face="bold", color="black"),
+                theme(axis.title.y = element_text(size=16, face="plain", color="black", angle=90),
+                      strip.text.y = element_text(size=16, face="plain", color="black"),
                       strip.background = element_rect(fill="white", size=0))
 
         heatmap_group = heatmap_group +
             ylab(annotations[1]) +
-            theme(axis.title.y = element_text(size=16, face="bold", color="black", angle=90),
+            theme(axis.title.y = element_text(size=16, face="plain", color="black", angle=90),
                   strip.background = element_rect(fill="white", size=0))
-        if (str_detect(readtype, "subtracted")){
+        if (readtype=="enrichment"){
             heatmap_sample = heatmap_sample +
                 facet_grid(replicate ~ group, scales="free_y", space="free_y")
 
@@ -521,16 +525,16 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
     } else if (n_anno==1 && max(k)>1){
         heatmap_sample = heatmap_sample +
             ylab(annotations[1]) +
-            theme(axis.title.y = element_text(size=16, face="bold", color="black", angle=90),
-                  strip.text.y = element_text(size=12, face="bold", color="black"),
+            theme(axis.title.y = element_text(size=16, face="plain", color="black", angle=90),
+                  strip.text.y = element_text(size=12, face="plain", color="black"),
                   strip.background = element_rect(fill="white", size=0))
 
         heatmap_group = heatmap_group +
             ylab(annotations[1]) +
-            theme(axis.title.y = element_text(size=16, face="bold", color="black", angle=90),
+            theme(axis.title.y = element_text(size=16, face="plain", color="black", angle=90),
                   strip.background = element_rect(fill="white", size=0))
 
-        if (str_detect(readtype, "subtracted")){
+        if (readtype=="enrichment"){
             heatmap_sample = heatmap_sample +
                 facet_grid(replicate + cluster ~ group, scales="free_y", space="free_y")
             heatmap_sample %<>%
@@ -552,15 +556,15 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
         }
     } else if (n_anno>1 && max(k)==1){
         heatmap_sample = heatmap_sample +
-            theme(strip.text.y = element_text(size=12, face="bold", color="black"),
+            theme(strip.text.y = element_text(size=12, face="plain", color="black"),
                   strip.background = element_rect(fill="white", size=0))
 
         heatmap_group = heatmap_group +
             theme(strip.background = element_rect(fill="white", size=0))
 
-        if (str_detect(readtype, "subtracted")){
+        if (readtype=="enrichment"){
             heatmap_sample = heatmap_sample +
-                facet_grid(replicate + n ~ group, scales="free_y", space="free_y")
+                facet_grid(replicate + annotation ~ group, scales="free_y", space="free_y")
             heatmap_sample %<>%
                 nest_right_facets(level=2, outer="replicate")
 
@@ -569,7 +573,7 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
 
         } else {
             heatmap_sample = heatmap_sample +
-                facet_grid(replicate + n ~ group + sampletype, scales="free_y", space="free_y")
+                facet_grid(replicate + annotation ~ group + sampletype, scales="free_y", space="free_y")
             heatmap_sample %<>%
                 nest_right_facets(level=2, outer="replicate") %>%
                 nest_top_facets(inner="strand", intype="gtable")
@@ -582,14 +586,14 @@ main = function(in_path, samplelist, anno_paths, ptype, readtype, upstream, dnst
 
     } else if (n_anno>1 && max(k)>1){
         heatmap_sample = heatmap_sample +
-            theme(strip.text.y = element_text(size=12, face="bold", color="black"),
+            theme(strip.text.y = element_text(size=12, face="plain", color="black"),
                   strip.background = element_rect(fill="white", size=0))
 
         heatmap_group = heatmap_group +
-            theme(strip.text.y = element_text(size=16, face="bold", color="black"),
+            theme(strip.text.y = element_text(size=16, face="plain", color="black"),
                   strip.background = element_rect(fill="white", size=0))
 
-        if (str_detect(readtype, "subtracted")){
+        if (readtype=="enrichment"){
             heatmap_sample = heatmap_sample +
                 facet_grid(replicate + annotation + cluster ~ group,
                            scales="free_y", space="free_y")

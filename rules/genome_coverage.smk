@@ -2,7 +2,7 @@
 
 localrules:
     normalize_genome_coverage,
-    subtract_inputs,
+    ratio_coverage,
     bedgraph_to_bigwig
 
 # bam must be sorted by name for bedpe.
@@ -79,29 +79,6 @@ rule normalize_genome_coverage:
                           'BEGIN{{FS=OFS="\t"}}{{$4=$4/norm_factor; print $0}}' {input.counts} > {output.normalized}) &> {log}
                   """)
 
-rule subtract_inputs:
-    input:
-        ip_sample = "coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bedgraph",
-        input_sample = lambda wc: f"coverage/{wc.norm}/{{sample}}_{FACTOR}-chipseq-{wc.norm}-{wc.readtype}.bedgraph".format(sample=CHIPS[wc.sample]["control"]),
-    output:
-        "coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}-input-subtracted.bedgraph",
-    shell: """
-        bedtools unionbedg -i {input.ip_sample} {input.input_sample} | \
-        awk 'BEGIN{{FS=OFS="\t"}}{{print $1, $2, $3, $4-$5}}' > {output}
-        """
-
-rule bedgraph_to_bigwig:
-    input:
-        bedgraph = f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bedgraph",
-        fasta = lambda wc: os.path.abspath(config["spike_in"]["fasta"]) if wc.norm=="sicounts" else os.path.abspath(config["genome"]["fasta"])
-    output:
-        f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw"
-    log:
-        "logs/bedgraph_to_bigwig/bedgraph_to_bigwig_{sample}-{readtype}-{norm}.log"
-    shell: """
-        (bedGraphToBigWig {input.bedgraph} <(faidx {input.fasta} -i chromsizes) {output}) &> {log}
-        """
-
 rule smoothed_midpoint_coverage:
     input:
         f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw"
@@ -115,5 +92,32 @@ rule smoothed_midpoint_coverage:
         "logs/smoothed_midpoint_coverage/smoothed_midpoint_coverage_{sample}-{norm}-{readtype}.log"
     shell: """
         (python scripts/smooth_midpoint_coverage.py -b {params.bandwidth} -i {input} -o {output}) &> {log}
+        """
+
+rule ratio_coverage:
+    input:
+        ip_sample = f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-midpoints_smoothed.bw",
+        input_sample =  lambda wc:
+            f"coverage/{wc.norm}/{{sample}}_{FACTOR}-chipseq-{wc.norm}-midpoints_smoothed.bw".format(sample=CHIPS[wc.sample]["control"])
+    output:
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-ratio.bw"
+    log:
+        "logs/ratio_coverage/ratio_coverage_{sample}-{norm}.log"
+    conda:
+        "../envs/smooth_coverage.yaml"
+    shell: """
+        (python scripts/make_ratio_bigwig.py -c {input.ip_sample} -i {input.input_sample} -o {output}) &> {log}
+        """
+
+rule bedgraph_to_bigwig:
+    input:
+        bedgraph = f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bedgraph",
+        fasta = lambda wc: os.path.abspath(config["spike_in"]["fasta"]) if wc.norm=="sicounts" else os.path.abspath(config["genome"]["fasta"])
+    output:
+        f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw"
+    log:
+        "logs/bedgraph_to_bigwig/bedgraph_to_bigwig_{sample}-{readtype}-{norm}.log"
+    shell: """
+        (bedGraphToBigWig {input.bedgraph} <(faidx {input.fasta} -i chromsizes) {output}) &> {log}
         """
 

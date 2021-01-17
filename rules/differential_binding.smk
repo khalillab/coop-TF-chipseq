@@ -72,12 +72,12 @@ rule differential_binding:
 
 rule diffbind_results_to_narrowpeak:
     input:
-        condition_coverage = lambda wc: expand(f"coverage/{wc.norm}/{{sample}}_{FACTOR}-chipseq-{wc.norm}-midpoints-input-subtracted_smoothed.bw",
+        condition_coverage = lambda wc: expand(f"coverage/{wc.norm}/{{sample}}_{FACTOR}-chipseq-{wc.norm}-ratio.bw",
                 sample=get_samples(passing=True,
                                    spikein=(True if wc.norm=="spikenorm" else False),
                                    paired=True,
                                    groups=[wc.condition])),
-        control_coverage = lambda wc: expand(f"coverage/{wc.norm}/{{sample}}_{FACTOR}-chipseq-{wc.norm}-midpoints-input-subtracted_smoothed.bw",
+        control_coverage = lambda wc: expand(f"coverage/{wc.norm}/{{sample}}_{FACTOR}-chipseq-{wc.norm}-ratio.bw",
                 sample=get_samples(passing=True,
                                    spikein=(True if wc.norm=="spikenorm" else False),
                                    paired=True,

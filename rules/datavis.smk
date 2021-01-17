@@ -2,7 +2,7 @@
 
 localrules:
     compute_matrix,
-    cat_matrices
+    cat_matrices,
 
 rule compute_matrix:
     input:
@@ -13,7 +13,7 @@ rule compute_matrix:
         matrix = temp("datavis/{figure}/{norm}/{annotation}_{sample}-{sampletype}-{norm}-{strand}.tsv"),
         melted = temp("datavis/{figure}/{norm}/{annotation}_{sample}-{sampletype}-{norm}-{strand}-melted.tsv.gz"),
     params:
-        group = lambda wc : SAMPLES[wc.sample]["group"],
+        group = lambda wc: SAMPLES[wc.sample]["group"],
         refpoint = lambda wc: "TSS" if FIGURES[wc.figure]["parameters"]["type"]=="scaled" else FIGURES[wc.figure]["parameters"]["refpoint"],
         upstream = lambda wc: FIGURES[wc.figure]["parameters"]["upstream"] + FIGURES[wc.figure]["parameters"]["binsize"],
         dnstream = lambda wc: FIGURES[wc.figure]["parameters"]["dnstream"] + FIGURES[wc.figure]["parameters"]["binsize"],
@@ -38,14 +38,8 @@ rule cat_matrices:
     input:
         lambda wc: expand("datavis/{{figure}}/{{norm}}/{annotation}_{sample}-{sampletype}-{{norm}}-{{strand}}-melted.tsv.gz",
                           annotation=list(FIGURES[wc.figure]["annotations"].keys()),
-                          sample={"libsizenorm":
-                                    {True: get_samples(paired=True),
-                                     False: CHIPS},
-                                  "spikenorm":
-                                    {True: get_samples(spikein=True, paired=True),
-                                     False: get_samples(spikein=True)}
-                                  }.get(wc.norm).get("-input-subtracted" in wc.strand),
-                          sampletype="ChIP" if "-input-subtracted" in wc.strand else ["ChIP", "input"])
+                          sample = get_samples(spikein=(wc.norm=="spikenorm")),
+                          sampletype="ChIP" if wc.strand=="ratio" else ["ChIP", "input"])
     output:
         "datavis/{figure}/{norm}/{figure}-allsamples-allannotations-{factor}-chipseq-{norm}-{strand}.tsv.gz"
     log:
@@ -72,11 +66,11 @@ rule plot_figures:
         # abusing snakemake a bit here...using params as output paths since in order to use lambda functions
         annotations_out = lambda wc: ["datavis/{figure}/{norm}/{condition}-v-{control}/{status}/{readtype}/".format(**wc) + annotation + "_cluster-" + str(cluster) + ".bed" for annotation in FIGURES[wc.figure]["annotations"] for cluster in range(1, FIGURES[wc.figure]["annotations"][annotation]["n_clusters"]+1)],
         clusters_out = lambda wc: ["datavis/{figure}/{norm}/{condition}-v-{control}/{status}/{readtype}/".format(**wc) + annotation + ".pdf" for annotation in FIGURES[wc.figure]["annotations"]],
-        samplelist = lambda wc: list(get_samples(passing=(True if wc.status=="passing" else False),
-                                                 spikein=(True if wc.norm=="spikenorm" else False),
+        samplelist = lambda wc: list(get_samples(passing=(wc.status=="passing"),
+                                                 spikein=(wc.norm=="spikenorm"),
                                                  groups=[wc.condition, wc.control]).keys()),
         plottype = lambda wc: FIGURES[wc.figure]["parameters"]["type"],
-        readtype = lambda wc: wc.readtype.split("-")[0] + ", input subtracted" if "subtracted" in wc.readtype else wc.readtype,
+        readtype = lambda wc: "enrichment" if wc.readtype=="ratio" else wc.readtype,
         upstream = lambda wc: FIGURES[wc.figure]["parameters"]["upstream"],
         dnstream = lambda wc: FIGURES[wc.figure]["parameters"]["dnstream"],
         scaled_length = lambda wc: 0 if FIGURES[wc.figure]["parameters"]["type"]=="absolute" else FIGURES[wc.figure]["parameters"]["scaled_length"],
@@ -90,8 +84,8 @@ rule plot_figures:
         sortmethod = lambda wc: FIGURES[wc.figure]["parameters"]["arrange"],
         cluster_scale = lambda wc: "FALSE" if FIGURES[wc.figure]["parameters"]["arrange"] != "cluster" else str(FIGURES[wc.figure]["parameters"]["cluster_scale"]).upper(),
         cluster_samples = lambda wc: [] if FIGURES[wc.figure]["parameters"]["arrange"] != "cluster" else \
-                list(get_samples(passing=(True if wc.status=="passing" else False),
-                                 spikein=(True if wc.norm=="spikenorm" else False),
+                list(get_samples(passing=(wc.status=="passing"),
+                                 spikein=(wc.norm=="spikenorm"),
                                  groups=FIGURES[wc.figure]["parameters"]["cluster_conditions"]).keys()),
         cluster_five = lambda wc: [] if FIGURES[wc.figure]["parameters"]["arrange"] != "cluster" else FIGURES[wc.figure]["parameters"]["cluster_five"],
         cluster_three = lambda wc: [] if FIGURES[wc.figure]["parameters"]["arrange"] != "cluster" else FIGURES[wc.figure]["parameters"]["cluster_three"],

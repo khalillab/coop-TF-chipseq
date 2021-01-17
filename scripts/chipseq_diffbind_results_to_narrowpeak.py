@@ -28,9 +28,15 @@ def average_bigwigs(coverage_paths):
 #If multiple positions have the same max signal, return the mean position
 def get_summit(row, coverage):
     local_coverage = coverage[row['chrom']][row['start']:row['end']]
-    return int(np.mean(np.argwhere(local_coverage==np.amax(local_coverage))))
+    if not np.any(np.isfinite(local_coverage)):
+        return int(len(local_coverage) / 2)
+    return int(np.mean(np.argwhere(local_coverage==np.amax(local_coverage[np.isfinite(local_coverage)]))))
 
-def main(condition_paths, control_paths, diffexp_path, narrowpeak_out, bed_out):
+def main(condition_paths,
+        control_paths,
+        diffexp_path,
+        narrowpeak_out,
+        bed_out):
 
     #condition and control coverage are imported separately and
     #averaged across replicates in case the number of samples
@@ -54,10 +60,10 @@ def main(condition_paths, control_paths, diffexp_path, narrowpeak_out, bed_out):
                                     'stat':str,
                                     'log10_pval':str,
                                     'log10_padj':str,
-                                    'mean_expr':str,
+                                    'mean_counts':str,
                                     'condition_enrichment':str,
                                     'condition_enrichment_SE':str,
-                                    'control_expr':str,
+                                    'control_enrichment':str,
                                     'control_enrichment_SE':str})
 
     if diffexp_df.shape[0] > 0:
@@ -68,8 +74,9 @@ def main(condition_paths, control_paths, diffexp_path, narrowpeak_out, bed_out):
     #NOTE: we convert NAs (found in pvalue and score columns) to zero for narrowpeak compatibility
     diffexp_df.to_csv(narrowpeak_out,
                       sep="\t",
-                      columns=['chrom', 'start', 'end', 'name', 'score', 'strand',
-                               'log2FC_enrichment', 'log10_pval', 'log10_padj', 'summit'],
+                      columns=(['chrom', 'start', 'end', 'name', 'score', 'strand',
+                               'log2FC_enrichment', 'log10_pval', 'log10_padj', 'summit'] if
+                               diffexp_df.shape[0] > 0 else []),
                       header=False,
                       index=False,
                       float_format="%.3f",
@@ -77,7 +84,8 @@ def main(condition_paths, control_paths, diffexp_path, narrowpeak_out, bed_out):
                       na_rep="0")
     diffexp_df.to_csv(bed_out,
                       sep="\t",
-                      columns=['chrom', 'summit_start', 'summit_end', 'name', 'score', 'strand'],
+                      columns=(['chrom', 'summit_start', 'summit_end', 'name', 'score', 'strand'] if
+                          diffexp_df.shape[0] > 0 else []),
                       header=False,
                       index=False,
                       float_format="%.3f",

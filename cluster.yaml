@@ -53,14 +53,6 @@ normalize_genome_coverage:
     time: 6
     mem: 50
 
-subtract_inputs:
-    time: 5
-    mem: 40
-
-bedgraph_to_bigwig:
-    time: 2
-    mem: 150
-
 callpeaks_macs2:
     time : 6
     mem : 800
@@ -81,26 +73,16 @@ plot_scatter_plots:
     time : 10
     mem : 4000
 
-compute_matrix:
-    time : 10
-    mem : 400
-
 plot_figures:
     time : 20
-    mem : 12000
+    mem : 16000
 
 differential_binding:
     time: 3
     mem: 1000
 
-# diffbind_results_to_narrowpeak:
-#     time: 2
-#     mem: 600
-
 meme_chip:
     time: 150
     mem: 600
     n: 1
-
-
 
