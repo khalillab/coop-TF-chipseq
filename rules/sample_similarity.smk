@@ -20,7 +20,7 @@ rule join_window_counts:
     output:
         f"qual_ctrl/scatter_plots/{FACTOR}_chipseq_union-bedgraph-{{norm}}-midpoint-window-{{windowsize}}-allsamples.tsv.gz"
     params:
-        names = lambda wc: list(SAMPLES.keys()) if wc.norm=="libsizenorm" else SISAMPLES.keys()
+        names = lambda wc: list(SAMPLES.keys()) if wc.norm=="libsizenorm" else list(SISAMPLES.keys())
     log:
         "logs/join_window_counts/join_window_counts-{norm}-{windowsize}.log"
     shell: """
