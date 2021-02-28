@@ -36,19 +36,21 @@ rule aggregate_read_numbers:
     input:
         adapter = expand("logs/clean_reads/clean_reads-{sample}.log", sample=SAMPLES),
         align = expand("logs/align/align_{sample}.log", sample=SAMPLES),
+        markdup = expand("logs/remove_duplicates/remove_duplicates_duplicate_stats_{sample}.log", sample=SAMPLES)
     output:
         f"qual_ctrl/read_processing/{FACTOR}_chipseq_read_processing_summary.tsv"
     log:
         "logs/read_processing_summary.log"
     run:
-        shell("""(echo -e "sample\traw\tcleaned\tmapped\tunique_map\tpaired" > {output}) &> {log}""")
-        for sample, adapter, align in zip(SAMPLES.keys(), input.adapter, input.align):
+        shell("""(echo -e "sample\traw\tcleaned\tmapped\tunique_map\tno_dups" > {output}) &> {log}""")
+        for sample, adapter, align, markdup in zip(SAMPLES.keys(), input.adapter, input.align, input.markdup):
             shell("""
                   (grep -e "Total read pairs processed:" -e "Pairs written" {adapter} | cut -d: -f2 | sed 's/,//g' | awk 'BEGIN{{ORS="\t"; print "{sample}"}}{{print $1}}' >> {output}
                    grep -e "1 time" {align} | awk 'BEGIN{{sum=0; ORS="\t"}} {{sum+=$1}} END{{print sum}}' >> {output}
-                   grep -e "exactly 1 time" {align} | awk 'BEGIN{{sum=0; ORS="\t"}} {{sum+=$1}} END{{print sum}}' >> {output}
-                   grep -e "concordantly exactly 1 time" {align} | awk '{{print $1}}' >> {output}) &> {log}
+                   grep -e "READ:" -e "WRITTEN:" {markdup} | cut -d ' ' -f2 | awk 'BEGIN{{ORS="\t"}} {{print $1/2}} END{{ORS="\\n"; print ""}}' >> {output}) &>> {log}
                    """)
+                   # grep -e "exactly 1 time" {align} | awk 'BEGIN{{sum=0; ORS="\t"}} {{sum+=$1}} END{{print sum}}' >> {output}
+                   # grep -e "concordantly exactly 1 time" {align} | awk '{{print $1}}' >> {output}) &> {log}
 
 rule plot_read_processing:
     input:

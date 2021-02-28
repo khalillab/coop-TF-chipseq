@@ -10,7 +10,7 @@ survival_plot = function(df, scalefactor, ylabel){
         scale_x_continuous(expand=c(0,0), breaks=2:6, name=NULL,
                            labels=c("raw reads", "reads cleaned",
                                     "aligned", "uniquely mapping",
-                                    "paired")) +
+                                    "no duplicates")) +
         scale_y_continuous(sec.axis=dup_axis(), name=ylabel) +
         facet_grid(sample~., switch="y") +
         theme_light() +
@@ -64,7 +64,7 @@ main = function(in_table, surv_abs_out, surv_rel_out, loss_out){
         scale_fill_viridis(name="% loss", guide=guide_colorbar(barheight = 10, barwidth=1)) +
         scale_color_viridis(guide=FALSE) +
         scale_x_discrete(labels = c("reads cleaned", "aligned",
-                                    "uniquely mapping", "paired"),
+                                    "uniquely mapping", "no duplicates"),
                          expand=c(0,0), name=NULL) +
         scale_y_continuous(breaks=0, expand=c(0,0), name=NULL) +
         facet_grid(sample~., switch="y") +
