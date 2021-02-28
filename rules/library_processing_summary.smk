@@ -64,10 +64,10 @@ rule plot_read_processing:
 
 rule build_spikein_counts_table:
     input:
-        ip_bam_experimental = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-experimental.bam", sample=get_samples(spikein=True, paired=True)),
-        ip_bam_spikein = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-spikein.bam", sample=get_samples(spikein=True, paired=True)),
-        input_bam_experimental = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-experimental.bam", sample=[v["control"] for k,v in get_samples(spikein=True, paired=True).items()]),
-        input_bam_spikein = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-spikein.bam", sample=[v["control"] for k,v in get_samples(spikein=True, paired=True).items()])
+        ip_bam_experimental = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-experimental.bam", sample=get_samples(spikein=True, paired=True)),
+        ip_bam_spikein = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-spikein.bam", sample=get_samples(spikein=True, paired=True)),
+        input_bam_experimental = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-experimental.bam", sample=[v["control"] for k,v in get_samples(spikein=True, paired=True).items()]),
+        input_bam_spikein = expand(f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-spikein.bam", sample=[v["control"] for k,v in get_samples(spikein=True, paired=True).items()])
     output:
         f"qual_ctrl/spikein/{FACTOR}-chipseq_spikein-counts.tsv"
     params:

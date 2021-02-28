@@ -3,7 +3,6 @@
 localrules:
     build_combined_genome,
     bowtie2_build,
-    index_bam,
 
 basename = "{exp_name}_{exp_fasta}_{si_name}_{si_fasta}".format(exp_name = config["genome"]["name"],
                                                                 exp_fasta = os.path.splitext(os.path.basename(config["genome"]["fasta"]))[0],
@@ -78,24 +77,32 @@ rule align:
         """
 
 #indexing is required for separating species by samtools view
-rule index_bam:
+rule remove_duplicates:
     input:
         f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
     output:
-        f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam.bai",
+        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates.bam",
+        index = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates.bam.csi",
+        markdup_log = "logs/remove_duplicates/remove_duplicates_duplicate_stats_{sample}.log"
     log:
-        "logs/index_bam/index_bam-{sample}.log"
+        "logs/remove_duplicates/remove_duplicates-{sample}.log"
+    threads:
+        config["threads"]
     shell: """
-        (samtools index {input}) &> {log}
+        (samtools collate -O -u --threads {threads} {input} | \
+                samtools fixmate -m -u --threads {threads} - - | \
+                samtools sort -u -@ {threads} | \
+                samtools markdup -r -f {output.markdup_log} -d 100 -m t --threads {threads} --write-index - {output.bam}) &> {log}
         """
 
 rule bam_separate_species:
     input:
-        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam",
-        bai = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam.bai",
+        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates.bam",
+        index = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates.bam.csi",
         fasta = "{directory}/{bn}.fa".format(directory = os.path.split(os.path.abspath(config["genome"]["fasta"]))[0], bn=basename) if SISAMPLES else [],
     output:
-        f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-{{species}}.bam",
+        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-{{species}}.bam",
+        index = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-{{species}}.bam.csi",
     params:
         filterprefix = lambda wc: config["spike_in"]["name"] if wc.species=="experimental" else config["genome"]["name"],
         prefix = lambda wc: config["genome"]["name"] if wc.species=="experimental" else config["spike_in"]["name"]
@@ -104,11 +111,11 @@ rule bam_separate_species:
     log:
         "logs/bam_separate_species/bam_separate_species-{sample}-{species}.log"
     shell: """
-        (samtools view -h {input.bam} $(faidx {input.fasta} -i chromsizes | \
-                                        grep {params.prefix}_ | \
-                                        awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') | \
+        (samtools view -h -@ {threads} {input.bam} $(faidx {input.fasta} -i chromsizes | \
+                                                     grep {params.prefix}_ | \
+                                                     awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') | \
          grep -v -e 'SN:{params.filterprefix}_' | \
          sed 's/{params.prefix}_//g' | \
-         samtools view -bh -@ {threads} -o {output} -) &> {log}
+         samtools view -bh -@ {threads} --write-index -o {output} -) &> {log}
         """
 

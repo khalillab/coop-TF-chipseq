@@ -4,8 +4,8 @@ localrules: combine_peaks
 
 rule callpeaks_macs2:
     input:
-        chip_bam = "alignment/{sample}_{factor}-chipseq-uniquemappers-{species}.bam",
-        input_bam = lambda wc: expand("alignment/{sample}_{{factor}}-chipseq-uniquemappers-{{species}}.bam", sample=SAMPLES[wc.sample]["control"]),
+        chip_bam = "alignment/{sample}_{factor}-chipseq-noduplicates-{species}.bam",
+        input_bam = lambda wc: expand("alignment/{sample}_{{factor}}-chipseq-noduplicates-{{species}}.bam", sample=SAMPLES[wc.sample]["control"]),
         fasta = lambda wc: os.path.abspath(config["genome"]["fasta"]) if wc.species=="experimental" else os.path.abspath(config["spike_in"]["fasta"]),
     output:
         tsv = "peakcalling/sample_peaks/{sample}_{species}-{factor}-chipseq_peaks.xls",

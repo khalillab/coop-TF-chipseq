@@ -9,7 +9,7 @@ localrules:
 # Not doing this in the bowtie step is an artifact of samtools indexing required position-sorted bam for splitting species in workflows with spike-ins.
 rule get_fragments:
     input:
-        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-{{species}}.bam" if SISAMPLES else "alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam"
+        bam = f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-{{species}}.bam" if SISAMPLES else "alignment/{{sample}}_{FACTOR}-chipseq-noduplicates.bam"
     output:
         f"alignment/fragments/{{sample}}_{FACTOR}-chipseq-{{species}}-fragments.bedpe"
     threads:
@@ -39,7 +39,7 @@ rule midpoint_coverage:
 
 rule protection_coverage:
     input:
-        bam = lambda wc: f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-experimental.bam" if wc.counttype=="counts" and SISAMPLES else f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers.bam" if wc.counttype=="counts" else f"alignment/{{sample}}_{FACTOR}-chipseq-uniquemappers-spikein.bam"
+        bam = lambda wc: f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-experimental.bam" if wc.counttype=="counts" and SISAMPLES else f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates.bam" if wc.counttype=="counts" else f"alignment/{{sample}}_{FACTOR}-chipseq-noduplicates-spikein.bam"
     output:
         f"coverage/{{counttype,counts|sicounts}}/{{sample}}_{FACTOR}-chipseq-{{counttype}}-protection.bedgraph"
     log:
@@ -52,10 +52,10 @@ rule protection_coverage:
 rule normalize_genome_coverage:
     input:
         counts = "coverage/counts/{sample}_{factor}-chipseq-counts-{readtype}.bedgraph",
-        bam_experimental = "alignment/{sample}_{factor}-chipseq-uniquemappers-experimental.bam",
-        bam_spikein = lambda wc: "alignment/{sample}_{factor}-chipseq-uniquemappers-spikein.bam" if wc.norm=="spikenorm" and wc.sample in CHIPS else [],
-        input_bam_experimental = lambda wc: "alignment/{sample}_{factor}-chipseq-uniquemappers-experimental.bam".format(sample=CHIPS[wc.sample]["control"], factor=wc.factor) if wc.norm=="spikenorm" and wc.sample in CHIPS else [],
-        input_bam_spikein = lambda wc: "alignment/{sample}_{factor}-chipseq-uniquemappers-spikein.bam".format(sample=CHIPS[wc.sample]["control"], factor=wc.factor) if wc.norm=="spikenorm" and wc.sample in CHIPS else []
+        bam_experimental = "alignment/{sample}_{factor}-chipseq-noduplicates-experimental.bam",
+        bam_spikein = lambda wc: "alignment/{sample}_{factor}-chipseq-noduplicates-spikein.bam" if wc.norm=="spikenorm" and wc.sample in CHIPS else [],
+        input_bam_experimental = lambda wc: "alignment/{sample}_{factor}-chipseq-noduplicates-experimental.bam".format(sample=CHIPS[wc.sample]["control"], factor=wc.factor) if wc.norm=="spikenorm" and wc.sample in CHIPS else [],
+        input_bam_spikein = lambda wc: "alignment/{sample}_{factor}-chipseq-noduplicates-spikein.bam".format(sample=CHIPS[wc.sample]["control"], factor=wc.factor) if wc.norm=="spikenorm" and wc.sample in CHIPS else []
     output:
         normalized = "coverage/{norm}/{sample}_{factor}-chipseq-{norm}-{readtype}.bedgraph",
     wildcard_constraints:

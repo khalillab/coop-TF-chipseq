@@ -27,6 +27,11 @@ align:
     n : 4
     mem : 1000
 
+remove_duplicates:
+    time: 5
+    n: 4
+    mem: 4000
+
 get_fragment_lengths:
     time: 90
     n: 4
