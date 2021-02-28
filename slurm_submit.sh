@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH -p priority
-#SBATCH -t 3:00:00
+#SBATCH -t 6:00:00
 #SBATCH --mem-per-cpu=400M
 #SBATCH -c 8
 #SBATCH -e snakemake.err
