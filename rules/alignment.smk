@@ -116,6 +116,6 @@ rule bam_separate_species:
                                                      awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') | \
          grep -v -e 'SN:{params.filterprefix}_' | \
          sed 's/{params.prefix}_//g' | \
-         samtools view -bh -@ {threads} --write-index -o {output} -) &> {log}
+         samtools view -bh -@ {threads} -o {output.bam} -) &> {log}
         """
 
