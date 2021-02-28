@@ -18,7 +18,7 @@ rule get_fragments:
         "logs/get_fragments/get_fragments_{sample}-{species}.log"
     shell: """
         rm -f .{wildcards.sample}_{wildcards.species}*.bam
-        (samtools sort -n -T .{wildcards.sample}_{wildcards.species} -@ {threads} {input.bam} | \
+        (samtools sort -n -T .get_fragments_{wildcards.sample}_{wildcards.species} -@ {threads} {input.bam} | \
          bedtools bamtobed -bedpe -i stdin > {output}) &> {log}
         """
 

@@ -9,7 +9,7 @@ localrules:
 
 rule get_fragment_lengths:
     input:
-        expand("alignment/{sample}_{factor}-chipseq-uniquemappers.bam", sample=SAMPLES, factor=FACTOR),
+        expand("alignment/{sample}_{factor}-chipseq-noduplicates.bam", sample=SAMPLES, factor=FACTOR),
     output:
         f"qual_ctrl/fragment_length_distributions/{FACTOR}_chipseq_fragment_length_distributions.tsv"
     params:

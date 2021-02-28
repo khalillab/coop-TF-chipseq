@@ -91,8 +91,8 @@ rule remove_duplicates:
     shell: """
         (samtools collate -O -u --threads {threads} {input} | \
                 samtools fixmate -m -u --threads {threads} - - | \
-                samtools sort -u -@ {threads} | \
-                samtools markdup -r -f {output.markdup_log} -d 100 -m t --threads {threads} --write-index - {output.bam}) &> {log}
+                samtools sort -u -T .remove_duplicates_sort_{wildcards.sample} -@ {threads} | \
+                samtools markdup -r -f {output.markdup_log} -d 100 -m t -T .remove_duplicates_markdup_{wildcards.sample} --threads {threads} --write-index - {output.bam}) &> {log}
         """
 
 rule bam_separate_species:
@@ -116,6 +116,6 @@ rule bam_separate_species:
                                                      awk 'BEGIN{{FS="\t"; ORS=" "}}{{print $1}}') | \
          grep -v -e 'SN:{params.filterprefix}_' | \
          sed 's/{params.prefix}_//g' | \
-         samtools view -bh -@ {threads} -o {output.bam} -) &> {log}
+         samtools view -bh -@ {threads} --write-index -o {output.bam} -) &> {log}
         """
 
