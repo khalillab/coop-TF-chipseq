@@ -13,9 +13,9 @@ fastqc:
     mem : 250
 
 plot_fastqc_summary:
-    time: 4
+    time: 8
     n: 1
-    mem: 400
+    mem: 4000
 
 clean_reads:
     time : 15
@@ -28,7 +28,7 @@ align:
     mem : 1000
 
 get_fragment_lengths:
-    time: 30
+    time: 90
     n: 4
     mem: 600
 
@@ -71,7 +71,7 @@ join_window_counts:
 
 plot_scatter_plots:
     time : 10
-    mem : 4000
+    mem : 20000
 
 plot_figures:
     time : 20
