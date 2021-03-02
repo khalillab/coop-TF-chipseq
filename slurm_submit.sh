@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH -p priority
-#SBATCH -t 6:00:00
+#SBATCH -t 8:00:00
 #SBATCH --mem-per-cpu=400M
 #SBATCH -c 8
 #SBATCH -e snakemake.err
@@ -16,6 +16,7 @@ snakemake -p \
     --rerun-incomplete \
     --cluster-config cluster.yaml \
     --use-conda \
+    --conda-prefix ../conda \
     --jobs 9999 \
     --restart-times 1 \
     --cluster "sbatch -p {cluster.queue} -c {cluster.n} -t {cluster.time} --mem-per-cpu={cluster.mem} -J {cluster.name} -e {cluster.err} -o {cluster.log} --parsable" \
