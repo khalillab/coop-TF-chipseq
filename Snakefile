@@ -124,11 +124,11 @@ rule all:
         expand(f"peakcalling/sample_peaks/{{sample}}_experimental-{FACTOR}-chipseq_peaks.narrowPeak",
                 sample=get_samples(passing=True, paired=True)) if not config['peakcalling']['skip_peakcalling'] else [],
         expand(f"peakcalling/sample_peaks/{{sample}}_spikein-{FACTOR}-chipseq_peaks.narrowPeak",
-                sample=get_samples(passing=True, spikein=True, paired=True)) if not config['peakcalling']['skip_peakcalling'] else [],
+                sample=get_samples(passing=True, spikein=True, paired=True)) if not config['peakcalling']['skip_spikein_peakcalling'] and comparisons_si  else [],
         expand(f"peakcalling/{{group}}/{{group}}_experimental-{FACTOR}-chipseq-idrpeaks.narrowPeak",
                 group=validgroups) if not config['peakcalling']['skip_peakcalling'] else [],
         expand(f"peakcalling/{{group}}/{{group}}_spikein-{FACTOR}-chipseq-idrpeaks.narrowPeak",
-                group=validgroups_si) if not config['peakcalling']['skip_peakcalling'] else [],
+                group=validgroups_si) if not config['peakcalling']['skip_spikein_peakcalling'] and comparisons_si else [],
         #genome coverage
         expand(f"coverage/{{norm}}/{{sample}}_{FACTOR}-chipseq-{{norm}}-{{readtype}}.bw",
                 norm=["counts","libsizenorm"],
@@ -198,7 +198,7 @@ rule all:
                annotation=list(config["differential_occupancy"]["annotations"].keys() \
                        if config["differential_occupancy"]["annotations"] else [])+["peaks"],
                direction=["all", "down", "nonsignificant", "up"],
-               factor=FACTOR) if comparisons_si and not config['differential_occupancy']['skip_differential_occupancy'] else [],
+               factor=FACTOR) if comparisons_si and not config['differential_occupancy']['skip_spikein_differential_occupancy'] else [],
         expand(expand("motifs/{{annotation}}/{condition}-v-{control}/libsizenorm/{condition}-v-{control}_{{factor}}-chipseq-libsizenorm-{{annotation}}-diffbind-results-{{direction}}-meme_chip/summary.tsv",
                        zip,
                        condition=conditiongroups,
@@ -214,5 +214,5 @@ rule all:
                annotation=list(config["differential_occupancy"]["annotations"].keys() \
                        if config["differential_occupancy"]["annotations"] else [])+["peaks"],
                direction=["all", "down", "nonsignificant", "up"],
-               factor=FACTOR) if comparisons_si and config["motifs"]["meme-chip"]["run-meme-chip"] and not config['differential_occupancy']['skip_differential_occupancy'] else [],
+               factor=FACTOR) if comparisons_si and config["motifs"]["meme-chip"]["run-meme-chip"] and not config['differential_occupancy']['skip_spikein_differential_occupancy'] else [],
 
