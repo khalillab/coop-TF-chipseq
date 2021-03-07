@@ -1,14 +1,26 @@
 #!/usr/bin/env python
 
 localrules:
+    make_spikein_windows,
     map_counts_to_annotations,
     combine_annotation_counts,
     diffbind_results_to_narrowpeak
 
+rule make_spikein_windows:
+    input:
+        fasta = os.path.abspath(config["spike_in"]["fasta"])
+    output:
+        "diff_binding/windows/spikein_windows_{windowsize}.bed"
+    shell: """
+        bedtools makewindows -g <(faidx {input.fasta} -i chromsizes) -w {wildcards.windowsize} | \
+        awk 'BEGIN{{FS=OFS="\t"}}{{print $1, $2, $3, ".", 0, "."}}' | \
+        LC_COLLATE=C sort -k1,1 -k2,2n > {output}
+        """
+
 rule map_counts_to_annotations:
     input:
         bed = lambda wc: "diff_binding/peaks/{condition}-v-{control}/{condition}-v-{control}_{species}-{factor}-peaks.bed" if wc.annotation=="peaks" \
-                else config["differential_occupancy"]["annotations"][wc.annotation],
+                else (f"diff_binding/windows/spikein_windows_{config['differential_occupancy']['spikein_window_size']}.bed" if wc.annotation=="windows" else config["differential_occupancy"]["annotations"][wc.annotation]),
         bg = lambda wc: "coverage/counts/{sample}_{factor}-chipseq-counts-midpoints.bedgraph" if wc.species=="experimental" else \
                 "coverage/sicounts/{sample}_{factor}-chipseq-sicounts-midpoints.bedgraph"
     output:
@@ -40,7 +52,7 @@ rule combine_annotation_counts:
 rule differential_binding:
     input:
         exp_counts = "diff_binding/{annotation}/{condition}-v-{control}/{condition}-v-{control}_allsamples-experimental-{factor}-chipseq-counts-{annotation}.tsv.gz",
-        spike_counts = lambda wc: [] if wc.norm=="libsizenorm" else "diff_binding/peaks/{condition}-v-{control}/{condition}-v-{control}_allsamples-spikein-{factor}-chipseq-counts-peaks.tsv.gz"
+        spike_counts = lambda wc: [] if wc.norm=="libsizenorm" else "diff_binding/windows/{condition}-v-{control}/{condition}-v-{control}_allsamples-spikein-{factor}-chipseq-counts-windows.tsv.gz"
     output:
         counts_norm = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-chipseq-counts-sizefactornorm.tsv",
         counts_rlog = "diff_binding/{annotation}/{condition}-v-{control}/{norm}/{condition}-v-{control}_{factor}-chipseq-{norm}-{annotation}-chipseq-counts-rlogtransform.tsv",
