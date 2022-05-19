@@ -1,0 +1,539 @@
+---
+#provide paths to unassigned read1 and read2 fastq files
+unmatched:
+    r1: fastq/Undetermined_S0_R1_001_merged.fastq.gz
+    r2: fastq/Undetermined_S0_R2_001_merged.fastq.gz
+
+genome:
+    name: Scer_reporter-URA3
+    fasta: ../genome/S_cerevisiae.R64-2-1_reporter-at-URA3.fa
+spike_in:
+    name: Spom_mitomask
+    fasta: ../genome/S_pombe.ASM294v2_mitomask.fa
+
+factor: ZF
+
+input_samples:
+    reporter-only-input-1:
+        r1: fastq/ChMB-12_S12_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-12_S12_R2_001_merged.fastq.gz
+        group : reporter-only
+        pass-qc : True
+        spikein: True
+    reporter-only-input-2:
+        r1: fastq/ChMB-16_S16_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-16_S16_R2_001_merged.fastq.gz
+        group: reporter-only
+        pass-qc: True
+        spikein: True
+    high-affinity-ZF-input-1:
+        r1: fastq/ChMB-11_S11_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-11_S11_R2_001_merged.fastq.gz
+        group: high-affinity-ZF
+        pass-qc: True
+        spikein: True
+    high-affinity-ZF-input-2:
+        r1: fastq/ChMB-15_S15_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-15_S15_R2_001_merged.fastq.gz
+        group: high-affinity-ZF
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-input-1:
+        r1: fastq/ChMB-10_S10_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-10_S10_R2_001_merged.fastq.gz
+        group: low-affinity-ZF
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-input-2:
+        r1: fastq/ChMB-14_S14_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-14_S14_R2_001_merged.fastq.gz
+        group: low-affinity-ZF
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-with-clamp-input-1:
+        r1: fastq/ChMB-9_S9_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-9_S9_R2_001_merged.fastq.gz
+        group: low-affinity-ZF-with-clamp
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-with-clamp-input-2:
+        r1: fastq/ChMB-13_S13_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-13_S13_R2_001_merged.fastq.gz
+        group: low-affinity-ZF-with-clamp
+        pass-qc: True
+        spikein: True
+    reporter-only-input-3:
+        r1: fastq/ChMB-28_S28_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-28_S28_R2_001_merged.fastq.gz
+        group : reporter-only
+        pass-qc : True
+        spikein: True
+    reporter-only-input-4:
+        r1: fastq/ChMB-32_S32_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-32_S32_R2_001_merged.fastq.gz
+        group: reporter-only
+        pass-qc: True
+        spikein: True
+    high-affinity-ZF-noVP16-input-1:
+        r1: fastq/ChMB-27_S27_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-27_S27_R2_001_merged.fastq.gz
+        group: high-affinity-ZF-noVP16
+        pass-qc: True
+        spikein: True
+    high-affinity-ZF-noVP16-input-2:
+        r1: fastq/ChMB-31_S31_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-31_S31_R2_001_merged.fastq.gz
+        group: high-affinity-ZF-noVP16
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-noVP16-input-1:
+        r1: fastq/ChMB-26_S26_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-26_S26_R2_001_merged.fastq.gz
+        group: low-affinity-ZF-noVP16
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-noVP16-input-2:
+        r1: fastq/ChMB-30_S30_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-30_S30_R2_001_merged.fastq.gz
+        group: low-affinity-ZF-noVP16
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-with-clamp-noVP16-input-1:
+        r1: fastq/ChMB-25_S25_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-25_S25_R2_001_merged.fastq.gz
+        group: low-affinity-ZF-with-clamp-noVP16
+        pass-qc: True
+        spikein: True
+    low-affinity-ZF-with-clamp-noVP16-input-2:
+        r1: fastq/ChMB-29_S29_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-29_S29_R2_001_merged.fastq.gz
+        group: low-affinity-ZF-with-clamp-noVP16
+        pass-qc: True
+        spikein: True
+
+#provide name and barcode sequence for each library
+chip_samples:
+    reporter-only-ZF-IP-1:
+        r1: fastq/ChMB-4_S4_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-4_S4_R2_001_merged.fastq.gz
+        control: reporter-only-input-1
+        group : reporter-only
+        pass-qc : True
+        spikein: True
+    reporter-only-ZF-IP-2:
+        r1: fastq/ChMB-8_S8_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-8_S8_R2_001_merged.fastq.gz
+        control: reporter-only-input-2
+        group : reporter-only
+        pass-qc : True
+        spikein: True
+    high-affinity-ZF-ZF-IP-1:
+        r1: fastq/ChMB-3_S3_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-3_S3_R2_001_merged.fastq.gz
+        control: high-affinity-ZF-input-1
+        group : high-affinity-ZF
+        pass-qc : True
+        spikein: True
+    high-affinity-ZF-ZF-IP-2:
+        r1: fastq/ChMB-7_S7_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-7_S7_R2_001_merged.fastq.gz
+        control: high-affinity-ZF-input-2
+        group : high-affinity-ZF
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-ZF-IP-1:
+        r1: fastq/ChMB-2_S2_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-2_S2_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-input-1
+        group : low-affinity-ZF
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-ZF-IP-2:
+        r1: fastq/ChMB-6_S6_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-6_S6_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-input-2
+        group : low-affinity-ZF
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-with-clamp-ZF-IP-1:
+        r1: fastq/ChMB-1_S1_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-1_S1_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-with-clamp-input-1
+        group : low-affinity-ZF-with-clamp
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-with-clamp-ZF-IP-2:
+        r1: fastq/ChMB-5_S5_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-5_S5_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-with-clamp-input-2
+        group : low-affinity-ZF-with-clamp
+        pass-qc : True
+        spikein: True
+    reporter-only-ZF-IP-3:
+        r1: fastq/ChMB-20_S20_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-20_S20_R2_001_merged.fastq.gz
+        control: reporter-only-input-3
+        group : reporter-only
+        pass-qc : True
+        spikein: True
+    reporter-only-ZF-IP-4:
+        r1: fastq/ChMB-24_S24_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-24_S24_R2_001_merged.fastq.gz
+        control: reporter-only-input-4
+        group : reporter-only
+        pass-qc : True
+        spikein: True
+    high-affinity-ZF-noVP16-ZF-IP-1:
+        r1: fastq/ChMB-19_S19_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-19_S19_R2_001_merged.fastq.gz
+        control: high-affinity-ZF-noVP16-input-1
+        group : high-affinity-ZF-noVP16
+        pass-qc : True
+        spikein: True
+    high-affinity-ZF-noVP16-ZF-IP-2:
+        r1: fastq/ChMB-23_S23_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-23_S23_R2_001_merged.fastq.gz
+        control: high-affinity-ZF-noVP16-input-2
+        group : high-affinity-ZF-noVP16
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-noVP16-ZF-IP-1:
+        r1: fastq/ChMB-18_S18_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-18_S18_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-noVP16-input-1
+        group : low-affinity-ZF-noVP16
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-noVP16-ZF-IP-2:
+        r1: fastq/ChMB-22_S22_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-22_S22_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-noVP16-input-2
+        group : low-affinity-ZF-noVP16
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-with-clamp-noVP16-ZF-IP-1:
+        r1: fastq/ChMB-17_S17_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-17_S17_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-with-clamp-noVP16-input-1
+        group : low-affinity-ZF-with-clamp-noVP16
+        pass-qc : True
+        spikein: True
+    low-affinity-ZF-with-clamp-noVP16-ZF-IP-2:
+        r1: fastq/ChMB-21_S21_R1_001_merged.fastq.gz
+        r2: fastq/ChMB-21_S21_R2_001_merged.fastq.gz
+        control: low-affinity-ZF-with-clamp-noVP16-input-2
+        group : low-affinity-ZF-with-clamp-noVP16
+        pass-qc : True
+        spikein: True
+
+comparisons:
+    libsizenorm:
+        - high-affinity-ZF: reporter-only
+        - low-affinity-ZF: reporter-only
+        - low-affinity-ZF-with-clamp: reporter-only
+        - low-affinity-ZF-with-clamp: low-affinity-ZF
+        - low-affinity-ZF: high-affinity-ZF
+        - low-affinity-ZF-with-clamp: high-affinity-ZF
+        - high-affinity-ZF-noVP16: reporter-only
+        - low-affinity-ZF-noVP16: reporter-only
+        - low-affinity-ZF-with-clamp-noVP16: reporter-only
+        - low-affinity-ZF-with-clamp-noVP16: low-affinity-ZF-noVP16
+        - low-affinity-ZF-noVP16: high-affinity-ZF-noVP16
+        - low-affinity-ZF-with-clamp-noVP16: high-affinity-ZF-noVP16
+    spikenorm:
+        - high-affinity-ZF: reporter-only
+        - low-affinity-ZF: reporter-only
+        - low-affinity-ZF-with-clamp: reporter-only
+        - low-affinity-ZF-with-clamp: low-affinity-ZF
+        - low-affinity-ZF: high-affinity-ZF
+        - low-affinity-ZF-with-clamp: high-affinity-ZF
+        - high-affinity-ZF-noVP16: reporter-only
+        - low-affinity-ZF-noVP16: reporter-only
+        - low-affinity-ZF-with-clamp-noVP16: reporter-only
+        - low-affinity-ZF-with-clamp-noVP16: low-affinity-ZF-noVP16
+        - low-affinity-ZF-noVP16: high-affinity-ZF-noVP16
+        - low-affinity-ZF-with-clamp-noVP16: high-affinity-ZF-noVP16
+
+cutadapt:
+    qual_cutoff : 20
+    cut_5prime: 0
+
+bowtie2:
+    index-path: ../genome/bowtie2_indexes
+    minmapq : 5
+    min_fraglength : 0  # minimum expected insert distance
+    max_fraglength : 600  # maximum expected insert distance
+
+smooth_bandwidth : 50
+
+scatterplot_binsizes:
+    # - 25
+    - 500
+    - 1000
+
+peakcalling:
+    skip_peakcalling: False
+    skip_spikein_peakcalling: True
+    llocal: 2000  # large region for calculating local lambda
+    slocal: 500  # small region for calculating local lambda
+    max-gap: 20  # maximum gap in nucleotides for peaks to be combined
+    idr: 0.05
+
+differential_occupancy:
+    skip_differential_occupancy: False
+    skip_spikein_differential_occupancy: False
+    spikein_window_size: 5000
+    fdr: 0.1
+    fold-change-threshold: 1
+    annotations:
+        # ZF-cumulative-peaklist-libsizenorm: ../genome/annotations/ZF_cumulative_peak_list_round2.bed
+        ZF-cumulative-peaklist-spikenorm: ../genome/annotations/ZF_cumulative_peak_list_round2_spikenorm.bed
+        ZF-cumulative-peaklist-spikenorm-noVP16: ../genome/annotations/ZF_cumulative_peak_list_round2_spikenorm_noVP16.bed
+        # custom-peaks-no-VP16-nofilter-only: diff_binding/peaks/low-affinity-ZF-noVP16-v-high-affinity-ZF-noVP16/libsizenorm/low-affinity-ZF-noVP16-v-high-affinity-ZF-noVP16_ZF-chipseq-libsizenorm-peaks-diffbind-results-all.narrowpeak
+        # verified_genes_plus_Venus: ../genome/annotations/Scer_transcripts_w_verifiedORFs-withVenus-URA3_reporter_strain.bed
+        # verified_genes_plus_Venus_upstream_windows: ../genome/annotations/rnaseq/high-affinity-ZF-v-reporter-only_rnaseq-libsizenorm-verified_genes_plus_Venus-diffexp-results-all-TSSs-slopL300.bed
+
+motifs:
+    dna_motif_database: /n/groups/winston/jc459/intragenic/build-annotations-cerevisiae/motifs/Scer_all_dna_motifs.meme
+    meme-chip:
+        run-meme-chip: False
+        search-dist: 100 # distance to search on either side of summit
+        meme-mode: anr #oops|zoops|anr
+        meme-nmotifs: 5
+
+#annotations and heatmap settings
+plot_figures: True
+figures:
+    verified-transcripts-nonoverlapping-TSS:  # [STRING] name of figure. Do not include underscores ("_")
+        annotations:
+            nonoverlapping-coding-genes:  # [STRING] name of region. Do not include underscores ("_"). More than one region can be plotted.
+                path: ../genome/annotations/Scer_transcripts_w_verifiedORFs_nonoverlapping-URA3_reporter_strain.bed
+                label: nonoverlapping coding genes  # [STRING] label for region
+                n_clusters: 1  # [INT] number of clusters to separate region into. Leave 1 for no clustering. Basic k-means clustering is used.
+        parameters:
+            type: absolute  # [absolute|scaled] Plot absolute distances, or scale all annotations to the same length. For MNase-seq you almost always want absolute distance
+            binsize: 20  # [INT] binsize to summarise data
+            binstat: mean  # [mean|median|min|max|sum|std] operation used to summarise data
+            refpoint: TSS  # [TSS|TES|center] reference point in region. TSS and TES correspond to the 5' and 3' ends, respectively.
+            refpointlabel: TSS  # [STRING] label for reference point
+            upstream: 400  # [INT] nucleotides upstream of reference point to plot. Must be a multiple of the binsize.
+            dnstream: 1500  # [INT] maximum nucleotides downstream of reference point to plot. Must be a multiple of the binsize.
+            nan_afterend: True  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+            pct_cutoff: .98  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+            log_transform: False
+            spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+            trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+            arrange: length   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+            # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+            #     - non-depleted
+            #     - depleted
+            # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+            # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+            heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    verified-transcripts-nonoverlapping-scaled:  # [STRING] name of figure. Do not include underscores ("_")
+        annotations:
+            nonoverlapping-coding-genes:  # [STRING] name of region. Do not include underscores ("_"). More than one region can be plotted.
+                path: ../genome/annotations/Scer_transcripts_w_verifiedORFs_nonoverlapping-URA3_reporter_strain.bed
+                label: nonoverlapping coding genes  # [STRING] label for region
+                n_clusters: 1  # [INT] number of clusters to separate region into. Leave 1 for no clustering. Basic k-means clustering is used.
+        parameters:
+            type: scaled # absolute | scaled
+            binsize : 20
+            binstat : mean # mean | median | min | max | sum | std
+            scaled_length: 2000 # int
+            upstream : 500 # int
+            dnstream : 500 # int
+            refpointlabel : TSS # string: label for 5prime reference point
+            endlabel : CPS # string: label for 3prime reference point
+            pct_cutoff : .95 # winsorize data above this percentile in heatmaps
+            log_transform: False
+            spread_type: quantile
+            trim_pct : 0.25
+            arrange: length
+            heatmap_colormap : inferno  # viridis | inferno | magma | plasma
+    reporter-binding-site:
+        annotations:
+            binding-site:
+                path: ../genome/annotations/42-10_binding_sites.bed
+                label: reporter 42-10 binding sites  # [STRING] label for region
+                n_clusters: 1  # [INT] number of clusters to separate region into. Leave 1 for no clustering. Basic k-means clustering is used.
+        parameters:
+            type: absolute  # [absolute|scaled] Plot absolute distances, or scale all annotations to the same length. For MNase-seq you almost always want absolute distance
+            binsize: 5  # [INT] binsize to summarise data
+            binstat: mean  # [mean|median|min|max|sum|std] operation used to summarise data
+            refpoint: center  # [TSS|TES|center] reference point in region. TSS and TES correspond to the 5' and 3' ends, respectively.
+            refpointlabel: 42-10 binding sites  # [STRING] label for reference point
+            upstream: 400  # [INT] nucleotides upstream of reference point to plot. Must be a multiple of the binsize.
+            dnstream: 1500  # [INT] maximum nucleotides downstream of reference point to plot. Must be a multiple of the binsize.
+            nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+            pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+            log_transform: False
+            spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+            trim_pct: 0.0  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+            arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+            # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+            #     - non-depleted
+            #     - depleted
+            # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+            # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+            heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    affinity-dependent-peaks:
+        annotations:
+            peaks:
+                path: diff_binding/ZF-cumulative-peaklist-spikenorm/low-affinity-ZF-v-high-affinity-ZF/libsizenorm/low-affinity-ZF-v-high-affinity-ZF_ZF-chipseq-libsizenorm-ZF-cumulative-peaklist-spikenorm-diffbind-results-down-summits.bed
+                # path: diff_binding/peaks/low-affinity-ZF-v-high-affinity-ZF/libsizenorm/low-affinity-ZF-v-high-affinity-ZF_ZF-chipseq-libsizenorm-peaks-diffbind-results-down-summits.bed
+                label: "ZF affinity-dependent peaks"
+                n_clusters: 1
+        parameters:
+            type: absolute
+            binsize: 20
+            binstat: mean
+            refpoint: center
+            refpointlabel: "peak summit"
+            upstream: 2000
+            dnstream: 2000
+            nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+            pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+            log_transform: False
+            spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+            trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+            arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+            # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+            #     - non-depleted
+            #     - depleted
+            # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+            # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+            heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    affinity-dependent-peaks-noVP16:
+        annotations:
+            peaks:
+                path: diff_binding/peaks/low-affinity-ZF-noVP16-v-high-affinity-ZF-noVP16/libsizenorm/low-affinity-ZF-noVP16-v-high-affinity-ZF-noVP16_ZF-chipseq-libsizenorm-peaks-diffbind-results-down-summits.bed
+                label: "ZF affinity-dependent peaks"
+                n_clusters: 1
+        parameters:
+            type: absolute
+            binsize: 20
+            binstat: mean
+            refpoint: center
+            refpointlabel: "peak summit"
+            upstream: 2000
+            dnstream: 2000
+            nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+            pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+            log_transform: False
+            spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+            trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+            arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+            # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+            #     - non-depleted
+            #     - depleted
+            # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+            # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+            heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    affinity-dependent-peaks-filtered:
+        annotations:
+            peaks:
+                path: ../genome/annotations/filtered_affinity_dependent_peak_summits.bed
+                label: "filtered ZF affinity-dependent peaks"
+                n_clusters: 1
+        parameters:
+            type: absolute
+            binsize: 20
+            binstat: mean
+            refpoint: center
+            refpointlabel: "peak summit"
+            upstream: 2000
+            dnstream: 2000
+            nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+            pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+            log_transform: False
+            spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+            trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+            arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+            # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+            #     - non-depleted
+            #     - depleted
+            # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+            # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+            heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    # zf-42-10-motifs:
+    #     annotations:
+    #         peaks:
+    #             path: ../genome/annotations/42-10_9bp_fimo_7e4_merge75_multimotifs.bed
+    #             label: "putative 42-10 binding sites"
+    #             n_clusters: 1
+    #     parameters:
+    #         type: absolute
+    #         binsize: 20
+    #         binstat: mean
+    #         refpoint: center
+    #         refpointlabel: "motif center"
+    #         upstream: 500
+    #         dnstream: 500
+    #         nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+    #         pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+    #         log_transform: False
+    #         spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+    #         trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+    #         arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+    #         # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+    #         #     - non-depleted
+    #         #     - depleted
+    #         # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+    #         # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+    #         heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    # zf-42-10-perfect-matches:
+    #     annotations:
+    #         peaks:
+    #             path: ../genome/annotations/42-10_perfect_matches.bed
+    #             label: "perfect 42-10 binding sites"
+    #             n_clusters: 1
+    #     parameters:
+    #         type: absolute
+    #         binsize: 20
+    #         binstat: mean
+    #         refpoint: center
+    #         refpointlabel: "motif center"
+    #         upstream: 1000
+    #         dnstream: 1000
+    #         nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+    #         pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+    #         log_transform: False
+    #         spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+    #         trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+    #         arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+    #         # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+    #         #     - non-depleted
+    #         #     - depleted
+    #         # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+    #         # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+    #         heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+    # pol3transcripts:
+    #     annotations:
+    #         peaks:
+    #             path: ../genome/annotations/Scer_pol3transcripts-URA3_reporter_strain.bed
+    #             label: "RNA Pol3 genes"
+    #             n_clusters: 1
+    #     parameters:
+    #         type: absolute
+    #         binsize: 20
+    #         binstat: mean
+    #         refpoint: center
+    #         refpointlabel: "gene center"
+    #         upstream: 800
+    #         dnstream: 800
+    #         nan_afterend: False  # [True|False] Should data after the end of the annotation be left out? Useful for length-sorted heatmaps.
+    #         pct_cutoff: .99  # [FLOAT in (0,1)] Percentile of the data to set as the maximum of the colorbar in heatmaps
+    #         log_transform: False
+    #         spread_type: quantile  # [conf_int|quantile] Plot 95% confidence interval of the mean, or quantiles of the data.
+    #         trim_pct: 0.25  # [FLOAT in (0,1)] For confidence intervals, this is the percent to winsorize before taking the mean. For quantiles, this is the lower quantile.
+    #         arrange: no   # [no|length|cluster] No: keep annotations in order of annotation file. Length: sort annotations in order of length before plotting. Cluster: try to plot annotations with similar data close to one another, using optimal leaf ordering of hierarchical clustering
+    #         # cluster_conditions:  # if arrange: cluster, the conditions to be used for clustering
+    #         #     - non-depleted
+    #         #     - depleted
+    #         # cluster_five: -500  # [INT] 5' boundary of the data to be used for clustering, relative to the reference point.
+    #         # cluster_three: 500  # [INT] 3' boundary of the data to be used for clustering, relative to the reference point
+    #         heatmap_colormap: inferno  # [viridis|inferno|magma|plasma] colormap for heatmaps
+
+threads: 4
+
