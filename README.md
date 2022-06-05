@@ -27,12 +27,6 @@ The workflow has the following major steps:
 ### required files
 
 - Paired FASTQ files of demultiplexed ChIP-seq libraries.
-
 - FASTA files of the experimental and spike-in genomes.
-
 - [BED6](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) format annotation files:
     - optional: annotations for data visualization
-
-## instructions
-
-TODO
